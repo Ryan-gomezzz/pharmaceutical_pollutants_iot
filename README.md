@@ -2,7 +2,7 @@
 
 An end-to-end IoT, Machine Learning, and Edge Robotics platform for monitoring and mitigating pharmaceutical pollutants in water streams in real-time.
 
-![Jellyfish Concept Form Factor](https://images.unsplash.com/photo-1543338573-0aa8a4a2de72?q=80&w=1200&auto=format&fit=crop)
+![Jellyfish Concept Form Factor](https://images.unsplash.com/photo-1544520786-89d2c499ea8d?q=80&w=1200&auto=format&fit=crop)
 
 ---
 

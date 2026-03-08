@@ -24,14 +24,20 @@
                 <h2>SensiFluid</h2>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-network-wired"></i> Nodes</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-brain"></i> AI Models</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+                <a href="#" class="nav-item active" data-target="view-dashboard"><i class="fa-solid fa-chart-pie"></i>
+                    Dashboard</a>
+                <a href="#" class="nav-item" data-target="view-nodes"><i class="fa-solid fa-network-wired"></i>
+                    Nodes</a>
+                <a href="#" class="nav-item" data-target="view-actuation"><i
+                        class="fa-solid fa-bolt-lightning text-purple"></i> Actuation</a>
+                <a href="#" class="nav-item" data-target="view-ai-models"><i class="fa-solid fa-brain"></i> AI
+                    Models</a>
+                <a href="#" class="nav-item" data-target="view-settings"><i class="fa-solid fa-sliders"></i>
+                    Settings</a>
             </nav>
             <div class="system-status online">
                 <div class="pulse-indicator"></div>
-                <span>System Online</span>
+                <span id="global-status-text">System Online</span>
             </div>
         </aside>
 
@@ -39,147 +45,381 @@
         <main class="main-content">
             <header class="top-header">
                 <div class="header-left">
-                    <h1>Real-time Analytics</h1>
-                    <p>Live telemetry from Jellyfish Sensor Node 01</p>
+                    <h1 id="page-title">Real-time Analytics</h1>
+                    <p id="page-subtitle">Live telemetry from Jellyfish Sensor Node 01</p>
                 </div>
                 <div class="header-right">
                     <div class="timestamp" id="last-updated">Updating...</div>
-                    <button class="btn btn-primary"><i class="fa-solid fa-download"></i> Export Report</button>
+                    <button class="btn btn-primary" id="btn-export"><i class="fa-solid fa-download"></i> Export
+                        Report</button>
                     <div class="profile-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
                 </div>
             </header>
 
-            <div class="dashboard-grid">
+            <div class="view-container">
 
-                <!-- Core AI Intelligence Row -->
-                <section class="ai-intelligence-row">
-                    <!-- AI Classification Card -->
-                    <div class="glass-card ai-card">
-                        <div class="card-header">
-                            <i class="fa-solid fa-microscope text-blue"></i>
-                            <h3>Water Composition</h3>
-                        </div>
-                        <div class="card-body">
-                            <h2 id="ai-classification" class="status-reading normal">Waiting...</h2>
-                            <p class="subtitle" id="ai-subtitle">Random Forest Classifier Offline</p>
-                        </div>
-                        <div class="card-footer">
-                            <span class="badge badge-blue">Confidence: 94%</span>
-                        </div>
-                    </div>
-
-                    <!-- Treatment Actuation Card -->
-                    <div class="glass-card ai-card">
-                        <div class="card-header">
-                            <i class="fa-solid fa-bolt text-purple"></i>
-                            <h3>Active Treatment</h3>
-                        </div>
-                        <div class="card-body">
-                            <h2 id="treatment-action" class="status-reading highlight">System Offline</h2>
-                            <p class="subtitle">Decision Engine Override</p>
-                        </div>
-                        <div class="card-footer">
-                            <span class="badge badge-purple">Actuator Node #2</span>
-                        </div>
-                    </div>
-
-                    <!-- Prediction Card -->
-                    <div class="glass-card ai-card">
-                        <div class="card-header">
-                            <i class="fa-solid fa-chart-line text-red"></i>
-                            <h3>Pollution Spike Risk</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="radial-progress-container">
-                                <h2 id="spike-prob" class="status-reading danger">0.0%</h2>
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="dashboard-grid">
+                        <!-- Core AI Intelligence Row -->
+                        <section class="ai-intelligence-row">
+                            <!-- AI Classification Card -->
+                            <div class="glass-card ai-card">
+                                <div class="card-header">
+                                    <i class="fa-solid fa-microscope text-blue"></i>
+                                    <h3>Water Composition</h3>
+                                </div>
+                                <div class="card-body">
+                                    <h2 id="ai-classification" class="status-reading normal">Waiting...</h2>
+                                    <p class="subtitle" id="ai-subtitle">Random Forest Classifier Offline</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="badge badge-blue">Confidence: 94%</span>
+                                </div>
                             </div>
-                            <p class="subtitle">LSTM Sequence Prediction (10-step)</p>
+
+                            <!-- Treatment Actuation Card -->
+                            <div class="glass-card ai-card">
+                                <div class="card-header">
+                                    <i class="fa-solid fa-bolt text-purple"></i>
+                                    <h3>Active Treatment</h3>
+                                </div>
+                                <div class="card-body">
+                                    <h2 id="treatment-action" class="status-reading highlight">System Offline</h2>
+                                    <p class="subtitle">Decision Engine Override</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="badge badge-purple">Actuator Node #2</span>
+                                </div>
+                            </div>
+
+                            <!-- Prediction Card -->
+                            <div class="glass-card ai-card">
+                                <div class="card-header">
+                                    <i class="fa-solid fa-chart-line text-red"></i>
+                                    <h3>Pollution Spike Risk</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="radial-progress-container">
+                                        <h2 id="spike-prob" class="status-reading danger">0.0%</h2>
+                                    </div>
+                                    <p class="subtitle">LSTM Sequence Prediction (10-step)</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="badge badge-red">Forward Looking</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Raw Telemetry Row -->
+                        <section class="telemetry-row">
+                            <div class="glass-card sensor-card">
+                                <div class="sensor-icon"><i class="fa-solid fa-flask"></i></div>
+                                <div class="sensor-data">
+                                    <h4 class="font-mono value" id="val-ph">0.00</h4>
+                                    <span class="unit">pH</span>
+                                </div>
+                                <div class="sensor-label">Acidity Level</div>
+                            </div>
+
+                            <div class="glass-card sensor-card">
+                                <div class="sensor-icon text-green"><i class="fa-solid fa-car-battery"></i></div>
+                                <div class="sensor-data">
+                                    <h4 class="font-mono value" id="val-tds">0.0</h4>
+                                    <span class="unit">ppm</span>
+                                </div>
+                                <div class="sensor-label">Total Dissolved Solids</div>
+                            </div>
+
+                            <div class="glass-card sensor-card">
+                                <div class="sensor-icon text-orange"><i class="fa-solid fa-cloud-meatball"></i></div>
+                                <div class="sensor-data">
+                                    <h4 class="font-mono value" id="val-turb">0.0</h4>
+                                    <span class="unit">NTU</span>
+                                </div>
+                                <div class="sensor-label">Turbidity</div>
+                            </div>
+
+                            <div class="glass-card sensor-card">
+                                <div class="sensor-icon text-purple"><i class="fa-solid fa-bolt-lightning"></i></div>
+                                <div class="sensor-data">
+                                    <h4 class="font-mono value" id="val-orp">0.0</h4>
+                                    <span class="unit">mV</span>
+                                </div>
+                                <div class="sensor-label">Oxidation Potential</div>
+                            </div>
+
+                            <div class="glass-card sensor-card">
+                                <div class="sensor-icon text-red"><i class="fa-solid fa-temperature-half"></i></div>
+                                <div class="sensor-data">
+                                    <h4 class="font-mono value" id="val-temp">0.0</h4>
+                                    <span class="unit">°C</span>
+                                </div>
+                                <div class="sensor-label">Temperature</div>
+                            </div>
+                        </section>
+
+                        <!-- Charting Row -->
+                        <section class="charts-row">
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-chart-area text-blue"></i> Turbidity Temporal Trend
+                                        </h3>
+                                        <p class="subtitle">Last 30 inferences</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="turbidityChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-chart-area text-green"></i> TDS Temporal Trend</h3>
+                                        <p class="subtitle">Last 30 inferences</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="tdsChart"></canvas>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div> <!-- END DASHBOARD VIEW -->
+
+                <!-- NODES VIEW -->
+                <div id="view-nodes" class="view-section">
+                    <div class="glass-card full-width">
+                        <div class="card-header">
+                            <i class="fa-solid fa-network-wired text-blue"></i>
+                            <h3>Hardware Fleet Topology</h3>
                         </div>
-                        <div class="card-footer">
-                            <span class="badge badge-red">Forward Looking</span>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Node ID</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Telemetry Frequency</th>
+                                        <th>IP Address</th>
+                                        <th>Uptime</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Jellyfish_01</strong></td>
+                                        <td>Sensor Edge Node</td>
+                                        <td><span class="badge badge-green"><i class="fa-solid fa-circle-check"></i>
+                                                Active</span></td>
+                                        <td>5 Seconds</td>
+                                        <td class="font-mono">192.168.1.112</td>
+                                        <td>99.98%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Actuator_02</strong></td>
+                                        <td>Action Edge Node</td>
+                                        <td><span class="badge badge-green"><i class="fa-solid fa-circle-check"></i>
+                                                Active</span></td>
+                                        <td>3 Seconds (Polling)</td>
+                                        <td class="font-mono">192.168.1.113</td>
+                                        <td>100%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Jellyfish_02</strong></td>
+                                        <td>Sensor Edge Node</td>
+                                        <td><span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i>
+                                                Offline</span></td>
+                                        <td>-</td>
+                                        <td class="font-mono">192.168.1.114</td>
+                                        <td>0.00%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- Raw Telemetry Row -->
-                <section class="telemetry-row">
-                    <div class="glass-card sensor-card">
-                        <div class="sensor-icon"><i class="fa-solid fa-flask"></i></div>
-                        <div class="sensor-data">
-                            <h4 class="font-mono value" id="val-ph">0.00</h4>
-                            <span class="unit">pH</span>
-                        </div>
-                        <div class="sensor-label">Acidity Level</div>
-                    </div>
+                <!-- ACTUATION VIEW -->
+                <div id="view-actuation" class="view-section">
+                    <div class="grid-2-col">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-server text-purple"></i>
+                                <h3>Actuator Control Panel</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="subtitle mb-4">The Decision Engine automatically controls these systems based
+                                    on AI inference, but manual overrides can be triggered below.</p>
 
-                    <div class="glass-card sensor-card">
-                        <div class="sensor-icon text-green"><i class="fa-solid fa-car-battery"></i></div>
-                        <div class="sensor-data">
-                            <h4 class="font-mono value" id="val-tds">0.0</h4>
-                            <span class="unit">ppm</span>
-                        </div>
-                        <div class="sensor-label">Total Dissolved Solids</div>
-                    </div>
+                                <div class="actuator-control-list">
+                                    <div class="control-item">
+                                        <div class="control-info">
+                                            <i class="fa-solid fa-water"></i>
+                                            <div>
+                                                <h4>Standard Pump</h4>
+                                                <p>Routes water securely bypassing treatment.</p>
+                                            </div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="chk-pump" disabled>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
 
-                    <div class="glass-card sensor-card">
-                        <div class="sensor-icon text-orange"><i class="fa-solid fa-cloud-meatball"></i></div>
-                        <div class="sensor-data">
-                            <h4 class="font-mono value" id="val-turb">0.0</h4>
-                            <span class="unit">NTU</span>
-                        </div>
-                        <div class="sensor-label">Turbidity</div>
-                    </div>
+                                    <div class="control-item">
+                                        <div class="control-info">
+                                            <i class="fa-solid fa-sun text-orange"></i>
+                                            <div>
+                                                <h4>UV LED Module</h4>
+                                                <p>Neutralizes biological & packaging residues.</p>
+                                            </div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="chk-uv" disabled>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
 
-                    <div class="glass-card sensor-card">
-                        <div class="sensor-icon text-purple"><i class="fa-solid fa-bolt-lightning"></i></div>
-                        <div class="sensor-data">
-                            <h4 class="font-mono value" id="val-orp">0.0</h4>
-                            <span class="unit">mV</span>
-                        </div>
-                        <div class="sensor-label">Oxidation Potential</div>
-                    </div>
+                                    <div class="control-item">
+                                        <div class="control-info">
+                                            <i class="fa-solid fa-bolt-lightning text-purple"></i>
+                                            <div>
+                                                <h4>Electrolysis Electrode</h4>
+                                                <p>Breaks down complex antibiotic compounds.</p>
+                                            </div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="chk-elec" disabled>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
 
-                    <div class="glass-card sensor-card">
-                        <div class="sensor-icon text-red"><i class="fa-solid fa-temperature-half"></i></div>
-                        <div class="sensor-data">
-                            <h4 class="font-mono value" id="val-temp">0.0</h4>
-                            <span class="unit">°C</span>
-                        </div>
-                        <div class="sensor-label">Temperature</div>
-                    </div>
-                </section>
-
-                <!-- Charting Row -->
-                <section class="charts-row">
-                    <div class="glass-card chart-container">
-                        <div class="chart-header">
-                            <div>
-                                <h3><i class="fa-solid fa-chart-area text-blue"></i> Turbidity Temporal Trend</h3>
-                                <p class="subtitle">Last 30 inferences</p>
+                                    <div class="control-item">
+                                        <div class="control-info">
+                                            <i class="fa-solid fa-filter text-blue"></i>
+                                            <div>
+                                                <h4>Heavy Pre-treatment</h4>
+                                                <p>Activated upon high Spike Probability.</p>
+                                            </div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="chk-pre" disabled>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="canvas-wrapper">
-                            <canvas id="turbidityChart"></canvas>
-                        </div>
-                    </div>
 
-                    <div class="glass-card chart-container">
-                        <div class="chart-header">
-                            <div>
-                                <h3><i class="fa-solid fa-chart-area text-green"></i> TDS Temporal Trend</h3>
-                                <p class="subtitle">Last 30 inferences</p>
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-shield-halved text-green"></i>
+                                <h3>Decision Engine Ruleset</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="rules-list">
+                                    <li><i class="fa-solid fa-arrow-right text-blue"></i> <strong>Spike > 80%:</strong>
+                                        Trigger Heavy Pre-treatment</li>
+                                    <li><i class="fa-solid fa-arrow-right text-blue"></i> <strong>Antibiotic
+                                            Contamination:</strong> Trigger Electrolysis</li>
+                                    <li><i class="fa-solid fa-arrow-right text-blue"></i> <strong>Packaging
+                                            Residue:</strong> Trigger UV Module</li>
+                                    <li><i class="fa-solid fa-arrow-right text-blue"></i> <strong>Normal Water:</strong>
+                                        Standard Pump Route</li>
+                                    <li><i class="fa-solid fa-arrow-right text-blue"></i> <strong>Anomaly/Hardware
+                                            Failure:</strong> System Offline Lock</li>
+                                </ul>
                             </div>
                         </div>
-                        <div class="canvas-wrapper">
-                            <canvas id="tdsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI MODELS VIEW -->
+                <div id="view-ai-models" class="view-section">
+                    <div class="grid-3-col">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-microchip text-orange"></i>
+                                <h3>Isolation Forest</h3>
+                            </div>
+                            <div class="card-body model-stats">
+                                <p><strong>Role:</strong> Outlier & Anomaly Detection</p>
+                                <p><strong>Type:</strong> Unsupervised Learning</p>
+                                <p><strong>Status:</strong> <span class="text-green">Active</span></p>
+                                <p><strong>File:</strong> <code>iso_forest.pkl</code></p>
+                                <p><strong>Contamination:</strong> 0.10</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-microscope text-blue"></i>
+                                <h3>Random Forest</h3>
+                            </div>
+                            <div class="card-body model-stats">
+                                <p><strong>Role:</strong> Component Classification</p>
+                                <p><strong>Type:</strong> Ensembles / Trees</p>
+                                <p><strong>Status:</strong> <span class="text-green">Active</span></p>
+                                <p><strong>File:</strong> <code>pollution_classifier.pkl</code></p>
+                                <p><strong>Accuracy/F1:</strong> 0.96</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-brain text-red"></i>
+                                <h3>LSTM Neural Net</h3>
+                            </div>
+                            <div class="card-body model-stats">
+                                <p><strong>Role:</strong> Time-Series Spike Prediction</p>
+                                <p><strong>Type:</strong> Deep Learning</p>
+                                <p><strong>Status:</strong> <span class="text-green">Active</span></p>
+                                <p><strong>File:</strong> <code>lstm_model.h5</code></p>
+                                <p><strong>Sequence Window:</strong> 10 Steps</p>
+                            </div>
                         </div>
                     </div>
-                </section>
+                </div>
+
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="view-section">
+                    <div class="glass-card" style="max-width: 600px;">
+                        <div class="card-header">
+                            <i class="fa-solid fa-sliders text-blue"></i>
+                            <h3>System Configuration</h3>
+                        </div>
+                        <div class="card-body form-group-list">
+                            <div class="form-group">
+                                <label>Backend API URL</label>
+                                <input type="text" class="input-element font-mono" value="http://127.0.0.1:5000/latest"
+                                    disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Polling Interval (ms)</label>
+                                <input type="number" class="input-element" value="2000" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Spike Probability Threshold (%)</label>
+                                <input type="number" class="input-element" value="80" disabled>
+                            </div>
+                            <div class="form-group mt-4">
+                                <button class="btn btn-primary" disabled><i class="fa-solid fa-save"></i> Save
+                                    Settings</button>
+                                <p class="subtitle mt-2 text-red" style="font-size: 0.8rem;">Settings currently locked
+                                    to read-only during active simulation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </main>
     </div>
 
+    <!-- Export Script via JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
