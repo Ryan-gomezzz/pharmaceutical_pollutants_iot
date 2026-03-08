@@ -173,7 +173,7 @@ body {
 .top-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     margin-bottom: 2.5rem;
 }
 
@@ -670,9 +670,16 @@ input:checked+.slider:before {
     gap: 1.5rem;
 }
 
+.model-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
 .model-stats p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
     color: var(--text-secondary);
+    line-height: 1.5;
 }
 
 .model-stats p strong {
