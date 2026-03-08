@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pharmaceutical Pollution Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Pharmaceutical Pollution Monitor</h1>
+            <p>Dual-Node IoT & Layered AI Architecture</p>
+        </header>
+
+        <main>
+            <section class="top-cards">
+                <div class="card status-card">
+                    <h3>Water Condition</h3>
+                    <div id="ai-classification" class="status-value normal">Loading...</div>
+                    <p class="subtitle" id="ai-subtitle">Isolation Forest & Random Forest</p>
+                </div>
+                <div class="card action-card">
+                    <h3>Active Treatment</h3>
+                    <div id="treatment-action" class="status-value highlight">--</div>
+                    <p class="subtitle">Decision Engine Actuator Command</p>
+                </div>
+                <div class="card prediction-card">
+                    <h3>Pollution Spike Risk</h3>
+                    <div id="spike-prob" class="status-value">--%</div>
+                    <p class="subtitle">LSTM Time-Series Prediction</p>
+                </div>
+            </section>
+
+            <section class="sensor-grid">
+                <div class="card sensor-card">
+                    <h3>pH Level</h3>
+                    <div class="value" id="val-ph">--</div>
+                    <div class="unit">pH</div>
+                </div>
+                <div class="card sensor-card">
+                    <h3>TDS</h3>
+                    <div class="value" id="val-tds">--</div>
+                    <div class="unit">ppm</div>
+                </div>
+                <div class="card sensor-card">
+                    <h3>Turbidity</h3>
+                    <div class="value" id="val-turb">--</div>
+                    <div class="unit">NTU</div>
+                </div>
+                <div class="card sensor-card">
+                    <h3>ORP</h3>
+                    <div class="value" id="val-orp">--</div>
+                    <div class="unit">mV</div>
+                </div>
+                <div class="card sensor-card">
+                    <h3>Temperature</h3>
+                    <div class="value" id="val-temp">--</div>
+                    <div class="unit">°C</div>
+                </div>
+            </section>
+
+            <section class="charts-area">
+                <div class="card chart-card">
+                    <h3>Turbidity Trend</h3>
+                    <canvas id="turbidityChart"></canvas>
+                </div>
+                <div class="card chart-card">
+                    <h3>TDS Trend</h3>
+                    <canvas id="tdsChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
