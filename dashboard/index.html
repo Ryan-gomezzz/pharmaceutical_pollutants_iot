@@ -4,75 +4,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Pharmaceutical Pollution Monitor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>SensiFluid | Professional IoT Dashboard</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div class="dashboard-container">
-        <header>
-            <h1>Pharmaceutical Pollution Monitor</h1>
-            <p>Dual-Node IoT & Layered AI Architecture</p>
-        </header>
+    <div class="app-container">
 
-        <main>
-            <section class="top-cards">
-                <div class="card status-card">
-                    <h3>Water Condition</h3>
-                    <div id="ai-classification" class="status-value normal">Loading...</div>
-                    <p class="subtitle" id="ai-subtitle">Isolation Forest & Random Forest</p>
-                </div>
-                <div class="card action-card">
-                    <h3>Active Treatment</h3>
-                    <div id="treatment-action" class="status-value highlight">--</div>
-                    <p class="subtitle">Decision Engine Actuator Command</p>
-                </div>
-                <div class="card prediction-card">
-                    <h3>Pollution Spike Risk</h3>
-                    <div id="spike-prob" class="status-value">--%</div>
-                    <p class="subtitle">LSTM Time-Series Prediction</p>
-                </div>
-            </section>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-water fa-2x brand-icon"></i>
+                <h2>SensiFluid</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-network-wired"></i> Nodes</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-brain"></i> AI Models</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            </nav>
+            <div class="system-status online">
+                <div class="pulse-indicator"></div>
+                <span>System Online</span>
+            </div>
+        </aside>
 
-            <section class="sensor-grid">
-                <div class="card sensor-card">
-                    <h3>pH Level</h3>
-                    <div class="value" id="val-ph">--</div>
-                    <div class="unit">pH</div>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1>Real-time Analytics</h1>
+                    <p>Live telemetry from Jellyfish Sensor Node 01</p>
                 </div>
-                <div class="card sensor-card">
-                    <h3>TDS</h3>
-                    <div class="value" id="val-tds">--</div>
-                    <div class="unit">ppm</div>
+                <div class="header-right">
+                    <div class="timestamp" id="last-updated">Updating...</div>
+                    <button class="btn btn-primary"><i class="fa-solid fa-download"></i> Export Report</button>
+                    <div class="profile-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
                 </div>
-                <div class="card sensor-card">
-                    <h3>Turbidity</h3>
-                    <div class="value" id="val-turb">--</div>
-                    <div class="unit">NTU</div>
-                </div>
-                <div class="card sensor-card">
-                    <h3>ORP</h3>
-                    <div class="value" id="val-orp">--</div>
-                    <div class="unit">mV</div>
-                </div>
-                <div class="card sensor-card">
-                    <h3>Temperature</h3>
-                    <div class="value" id="val-temp">--</div>
-                    <div class="unit">°C</div>
-                </div>
-            </section>
+            </header>
 
-            <section class="charts-area">
-                <div class="card chart-card">
-                    <h3>Turbidity Trend</h3>
-                    <canvas id="turbidityChart"></canvas>
-                </div>
-                <div class="card chart-card">
-                    <h3>TDS Trend</h3>
-                    <canvas id="tdsChart"></canvas>
-                </div>
-            </section>
+            <div class="dashboard-grid">
+
+                <!-- Core AI Intelligence Row -->
+                <section class="ai-intelligence-row">
+                    <!-- AI Classification Card -->
+                    <div class="glass-card ai-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-microscope text-blue"></i>
+                            <h3>Water Composition</h3>
+                        </div>
+                        <div class="card-body">
+                            <h2 id="ai-classification" class="status-reading normal">Waiting...</h2>
+                            <p class="subtitle" id="ai-subtitle">Random Forest Classifier Offline</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="badge badge-blue">Confidence: 94%</span>
+                        </div>
+                    </div>
+
+                    <!-- Treatment Actuation Card -->
+                    <div class="glass-card ai-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-bolt text-purple"></i>
+                            <h3>Active Treatment</h3>
+                        </div>
+                        <div class="card-body">
+                            <h2 id="treatment-action" class="status-reading highlight">System Offline</h2>
+                            <p class="subtitle">Decision Engine Override</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="badge badge-purple">Actuator Node #2</span>
+                        </div>
+                    </div>
+
+                    <!-- Prediction Card -->
+                    <div class="glass-card ai-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-chart-line text-red"></i>
+                            <h3>Pollution Spike Risk</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="radial-progress-container">
+                                <h2 id="spike-prob" class="status-reading danger">0.0%</h2>
+                            </div>
+                            <p class="subtitle">LSTM Sequence Prediction (10-step)</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="badge badge-red">Forward Looking</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Raw Telemetry Row -->
+                <section class="telemetry-row">
+                    <div class="glass-card sensor-card">
+                        <div class="sensor-icon"><i class="fa-solid fa-flask"></i></div>
+                        <div class="sensor-data">
+                            <h4 class="font-mono value" id="val-ph">0.00</h4>
+                            <span class="unit">pH</span>
+                        </div>
+                        <div class="sensor-label">Acidity Level</div>
+                    </div>
+
+                    <div class="glass-card sensor-card">
+                        <div class="sensor-icon text-green"><i class="fa-solid fa-car-battery"></i></div>
+                        <div class="sensor-data">
+                            <h4 class="font-mono value" id="val-tds">0.0</h4>
+                            <span class="unit">ppm</span>
+                        </div>
+                        <div class="sensor-label">Total Dissolved Solids</div>
+                    </div>
+
+                    <div class="glass-card sensor-card">
+                        <div class="sensor-icon text-orange"><i class="fa-solid fa-cloud-meatball"></i></div>
+                        <div class="sensor-data">
+                            <h4 class="font-mono value" id="val-turb">0.0</h4>
+                            <span class="unit">NTU</span>
+                        </div>
+                        <div class="sensor-label">Turbidity</div>
+                    </div>
+
+                    <div class="glass-card sensor-card">
+                        <div class="sensor-icon text-purple"><i class="fa-solid fa-bolt-lightning"></i></div>
+                        <div class="sensor-data">
+                            <h4 class="font-mono value" id="val-orp">0.0</h4>
+                            <span class="unit">mV</span>
+                        </div>
+                        <div class="sensor-label">Oxidation Potential</div>
+                    </div>
+
+                    <div class="glass-card sensor-card">
+                        <div class="sensor-icon text-red"><i class="fa-solid fa-temperature-half"></i></div>
+                        <div class="sensor-data">
+                            <h4 class="font-mono value" id="val-temp">0.0</h4>
+                            <span class="unit">°C</span>
+                        </div>
+                        <div class="sensor-label">Temperature</div>
+                    </div>
+                </section>
+
+                <!-- Charting Row -->
+                <section class="charts-row">
+                    <div class="glass-card chart-container">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-chart-area text-blue"></i> Turbidity Temporal Trend</h3>
+                                <p class="subtitle">Last 30 inferences</p>
+                            </div>
+                        </div>
+                        <div class="canvas-wrapper">
+                            <canvas id="turbidityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card chart-container">
+                        <div class="chart-header">
+                            <div>
+                                <h3><i class="fa-solid fa-chart-area text-green"></i> TDS Temporal Trend</h3>
+                                <p class="subtitle">Last 30 inferences</p>
+                            </div>
+                        </div>
+                        <div class="canvas-wrapper">
+                            <canvas id="tdsChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </main>
     </div>
 
