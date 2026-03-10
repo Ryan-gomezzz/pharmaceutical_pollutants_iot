@@ -9,7 +9,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(base_dir, "..", "dataset", "pollution_data.csv")
 data = pd.read_csv(csv_path)
 
-X = data[['ph','tds','turbidity','orp','temperature']]
+X = data[['ph','tds','turbidity','temperature']]
 y = data['label']
 
 X_train, X_test, y_train, y_test = train_test_split(

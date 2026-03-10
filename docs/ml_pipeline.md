@@ -7,7 +7,7 @@ Run the built-in automation script to create the synthetic dataset locally:
 ```bash
 python setup_ml_pipeline.py
 ```
-This drops `dataset/pollution_data.csv` populated with 10k highly randomized but constrained realistic time-series samples mimicking real environmental sensor metrics.
+This drops `dataset/pollution_data.csv` populated with 10k highly randomized but constrained realistic time-series samples mimicking real environmental sensor metrics across 4 features (pH, TDS, Turbidity, Temperature) with 4 distributed labels (including anomalous readings) injected with Gaussian noise/drift.
 
 ## 2. Upload to Google Colab
 1. Navigate to Google Colab.
@@ -19,8 +19,8 @@ Run the Colab notebook cells from top-to-bottom! Because deep networks like LSTM
 
 ## 4. Download Trained Artifacts
 Once Colab finalizes your epochs, download the generated weight outputs from the cloud:
-- `pollution_classifier.pkl` (Random Forest Matrix)
-- `lstm_model.h5` (Keras Deep Learning Network)
+- `pollution_classifier.pkl` (Random Forest Matrix for 4-Class Sorting)
+- `lstm_model.keras` (Keras Deep Learning Network built natively for TensorFlow backwards compatibility)
 - `scaler.pkl` (MinMax mapping weights required natively for the backend)
 
 ## 5. Implement Models

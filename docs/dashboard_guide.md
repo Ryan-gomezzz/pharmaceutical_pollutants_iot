@@ -5,7 +5,7 @@ The SensiFluid Dashboard has been upgraded into a modern, responsive Single Page
 ## 1. 📊 Dashboard (Real-time Analytics)
 **Purpose:** The primary command center. Provides an instant, high-level overview of the entire system's current status based on the latest telemetry stream.
 - **Top Row (AI Intelligence):** Displays the current Random Forest classification (Normal/Packaging/Antibiotic), the Decision Engine's active counter-measure, and the LSTM's live prediction of an impending spike.
-- **Middle Row (Telemetry):** Raw hardware numerical outputs from the ESP32 (pH, TDS, Turbidity, ORP, Temperature).
+- **Middle Row (Telemetry):** Raw hardware numerical outputs from the ESP32 (pH, TDS, Turbidity, Temperature).
 - **Bottom Row (Trends):** Two dynamic Chart.js canvas elements plotting the last 30 inferences of Turbidity and TDS over a rolling time window to visualize temporal trends.
 
 ## 2. 🖧 Nodes (Hardware Fleet Topology)

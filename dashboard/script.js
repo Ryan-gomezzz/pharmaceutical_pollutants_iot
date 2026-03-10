@@ -41,12 +41,12 @@ document.getElementById('btn-export').addEventListener('click', function () {
     }
 
     // Create CSV Header
-    const headers = ["Timestamp", "pH", "TDS_ppm", "Turbidity_NTU", "ORP_mV", "Temp_C", "Spike_Prob", "Classification", "Action", "Anomaly"];
+    const headers = ["Timestamp", "pH", "TDS_ppm", "Turbidity_NTU", "Temp_C", "Spike_Prob", "Classification", "Action", "Anomaly"];
     let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
 
     globalDataLog.forEach(row => {
         const rowData = [
-            row.time, row.ph, row.tds, row.turbidity, row.orp, row.temperature,
+            row.time, row.ph, row.tds, row.turbidity, row.temperature,
             row.spike_probability,
             `"${row.classification}"`, // Wrap in quotes in case of spaces
             `"${row.treatment_action}"`,
@@ -139,7 +139,6 @@ function updateDashboard(data) {
     document.getElementById('val-ph').innerText = data.ph.toFixed(2);
     document.getElementById('val-tds').innerText = data.tds.toFixed(1);
     document.getElementById('val-turb').innerText = data.turbidity.toFixed(1);
-    document.getElementById('val-orp').innerText = data.orp.toFixed(1);
     document.getElementById('val-temp').innerText = data.temperature.toFixed(1);
 
     // Classification Update

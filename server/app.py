@@ -15,7 +15,6 @@ latest_state = {
     "ph": 0.0,
     "tds": 0.0,
     "turbidity": 0.0,
-    "orp": 0.0,
     "temperature": 0.0,
     "classification": "Waiting for data...",
     "anomaly": False,
@@ -32,18 +31,18 @@ def receive_sensor_data():
     if not data or "node" not in data or data["node"] != "sensor_node":
         return jsonify({"error": "Invalid request"}), 400
 
-    required = ["ph", "tds", "turbidity", "orp", "temperature"]
+    required = ["ph", "tds", "turbidity", "temperature"]
     if not all(k in data for k in required):
         return jsonify({"error": "Missing data"}), 400
 
     # 1. Run Machine Learning models (Anomaly + Classification)
     ml_result = ml_model.predict(
         data["ph"], data["tds"], data["turbidity"], 
-        data["orp"], data["temperature"]
+        data["temperature"]
     )
     
     # 2. Update buffer and run Deep Learning model
-    reading = [data["ph"], data["tds"], data["turbidity"], data["orp"], data["temperature"]]
+    reading = [data["ph"], data["tds"], data["turbidity"], data["temperature"]]
     sensor_buffer.append(reading)
     
     spike_prob = 0.0
@@ -55,16 +54,15 @@ def receive_sensor_data():
     
     # 4. Update the global state
     latest_state.update({
-        "ph": data["ph"],
-        "tds": data["tds"],
-        "turbidity": data["turbidity"],
-        "orp": data["orp"],
-        "temperature": data["temperature"],
-        "classification": ml_result["status"],
-        "anomaly": ml_result["anomaly"],
-        "spike_probability": round(spike_prob, 4),
-        "treatment_action": action,
-        "timestamp": time.time()
+        "ph": float(data["ph"]),
+        "tds": float(data["tds"]),
+        "turbidity": float(data["turbidity"]),
+        "temperature": float(data["temperature"]),
+        "classification": str(ml_result["status"]),
+        "anomaly": bool(ml_result["anomaly"]),
+        "spike_probability": float(round(spike_prob, 4)),
+        "treatment_action": str(action),
+        "timestamp": float(time.time())
     })
 
     return jsonify({"message": "Data processed"}), 200

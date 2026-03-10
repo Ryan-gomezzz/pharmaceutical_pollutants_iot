@@ -10,7 +10,6 @@ const char* SERVER_URL = "http://192.168.1.100:5000/sensor-data"; // Replace wit
 #define PH_PIN 34
 #define TDS_PIN 35
 #define TURBIDITY_PIN 32
-#define ORP_PIN 33
 #define TEMP_PIN 4
 
 OneWire oneWire(TEMP_PIN);
@@ -37,7 +36,6 @@ void loop() {
     float ph = analogRead(PH_PIN) * (3.3 / 4095.0) * 3.5; 
     float tds = analogRead(TDS_PIN) * 0.5;
     float turbidity = analogRead(TURBIDITY_PIN) * 0.1;
-    float orp = analogRead(ORP_PIN) + 100;
     
     sensors.requestTemperatures(); 
     float temperature = sensors.getTempCByIndex(0);
@@ -47,7 +45,6 @@ void loop() {
     payload += "\"ph\":" + String(ph) + ",";
     payload += "\"tds\":" + String(tds) + ",";
     payload += "\"turbidity\":" + String(turbidity) + ",";
-    payload += "\"orp\":" + String(orp) + ",";
     payload += "\"temperature\":" + String(temperature);
     payload += "}";
 

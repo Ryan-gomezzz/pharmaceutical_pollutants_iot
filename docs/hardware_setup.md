@@ -9,7 +9,6 @@ Monitors water quality and transmits data to the server.
 | pH            | GPIO 34   | 3.3V  | GND    |
 | TDS           | GPIO 35   | 3.3V  | GND    |
 | Turbidity     | GPIO 32   | 3.3V  | GND    |
-| ORP           | GPIO 33   | 3.3V  | GND    |
 | DS18B20 (Temp)| GPIO 4    | 3.3V  | GND    |
 
 *Note: Ensure DS18B20 has a 4.7k pull-up resistor between Data and VCC.*

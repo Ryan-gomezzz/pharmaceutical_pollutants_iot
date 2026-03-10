@@ -10,7 +10,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(base_dir, "..", "dataset", "pollution_data.csv")
 data = pd.read_csv(csv_path)
 
-features = data[['ph','tds','turbidity','orp','temperature']].values
+features = data[['ph','tds','turbidity','temperature']].values
 
 scaler = MinMaxScaler()
 features = scaler.fit_transform(features)
@@ -35,7 +35,7 @@ y = np.array(y)
 
 model = Sequential()
 
-model.add(LSTM(64,input_shape=(sequence_length,5)))
+model.add(LSTM(64,input_shape=(sequence_length,4)))
 model.add(Dense(32,activation='relu'))
 model.add(Dense(1))
 
@@ -50,7 +50,7 @@ model.fit(
     batch_size=32
 )
 
-model_path = os.path.join(models_dir, "lstm_model.h5")
+model_path = os.path.join(models_dir, "lstm_model.keras")
 model.save(model_path)
 
 print("LSTM model saved")

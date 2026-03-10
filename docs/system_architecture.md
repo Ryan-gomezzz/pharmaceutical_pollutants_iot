@@ -9,13 +9,13 @@ This is a comprehensive Dual-Node IoT Smart Wastewater Monitoring system featuri
 ## Component Layers
 
 ### 1. Edge Layer
-- **Sensor Node:** Collects ph, tds, turbidity, orp, and temperature every 5 seconds.
+- **Sensor Node:** Collects pH, TDS, Turbidity, and Temperature every 5 seconds.
 - **Actuator Node:** Polls the server every 3 seconds for treatment commands.
 
 ### 2. AI Processing Layer (Python Backend)
-- **Anomaly Detection:** `Isolation Forest` detects whether the incoming sensor data represents a fundamental system error or extreme anomaly.
-- **Pollution Classification:** `RandomForestClassifier` categorizes the water into: Normal (0), Packaging Residue (1), or Antibiotic Contamination (2).
-- **Time-Series Prediction:** `LSTM` predicts the probability of a pollution spike based on the last 10 readings.
+- **Anomaly Detection:** `Isolation Forest` detects whether the incoming sensor data represents a fundamental system error or extreme anomaly (used in parallel, capturing extreme out-of-bounds readings).
+- **Pollution Classification:** `RandomForestClassifier` categorizes the water into 4 classes based on features: Normal (0), Packaging Residue (1), Antibiotic Contamination (2), and Systemic Anomaly (3).
+- **Time-Series Prediction:** `LSTM` predicts the probability of a pollution spike based on the last 10 readings of the multi-variate continuous time series block.
 
 ### 3. Application & Decision Layer
 - **Decision Engine:** Determines physical intervention. For example: Antibiotics trigger Electrolysis. Spikes trigger preemptive pre-treatment.

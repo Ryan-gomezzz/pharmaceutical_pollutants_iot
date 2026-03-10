@@ -9,13 +9,13 @@ scaler = None
 def load_model():
     global model, scaler
     base_dir = os.path.dirname(__file__)
-    model_path = os.path.join(base_dir, "..", "models", "lstm_model.h5")
+    model_path = os.path.join(base_dir, "..", "models", "lstm_model.keras")
     scaler_path = os.path.join(base_dir, "..", "models", "scaler.pkl")
     
     if os.path.exists(model_path):
         tf.get_logger().setLevel('ERROR')
         model = tf.keras.models.load_model(model_path)
-        print("DL Model (lstm_model.h5) loaded successfully.")
+        print("DL Model (lstm_model.keras) loaded successfully.")
     else:
         print(f"Warning: DL model not found at {model_path}.")
         
@@ -35,7 +35,7 @@ def predict_spike(raw_buffer):
         return 0.0
         
     # User's training mapped: 
-    # data[['ph','tds','turbidity','orp','temperature']].values
+    # data[['ph','tds','turbidity','temperature']].values
     # features = scaler.fit_transform(features)
     # Then y.append(features[i+sequence_length][2]) # Predict turbidity
     
@@ -49,7 +49,7 @@ def predict_spike(raw_buffer):
     turbidity_pred_scaled = prediction[0][0]
     
     # We create a dummy array to inverse transform just the turbidity
-    dummy = np.zeros((1, 5))
+    dummy = np.zeros((1, 4))
     dummy[0][2] = turbidity_pred_scaled
     pred_real = scaler.inverse_transform(dummy)[0][2]
     
