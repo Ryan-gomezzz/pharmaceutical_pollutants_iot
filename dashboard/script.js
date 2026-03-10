@@ -160,9 +160,9 @@ const tdsChart = new Chart(tdsCtx, {
 });
 
 const phCtx = document.getElementById('phChart').getContext('2d');
-const phGradient = createGradient(phCtx, 'rgba(124, 58, 237, 0.15)', 'rgba(124, 58, 237, 0.0)');
+const phGradient = createGradient(phCtx, 'rgba(79, 70, 229, 0.15)', 'rgba(79, 70, 229, 0.0)');
 const phChart = new Chart(phCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#7c3aed', backgroundColor: phGradient, pointBackgroundColor: '#111113', pointBorderColor: '#7c3aed', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#4f46e5', backgroundColor: phGradient, pointBackgroundColor: '#111113', pointBorderColor: '#4f46e5', fill: true }] }, options: commonOptions
 });
 
 const tempCtx = document.getElementById('tempChart').getContext('2d');
@@ -185,7 +185,7 @@ const classPieChart = new Chart(pieCtx, {
         labels: ['Normal Water', 'Packaging Residue', 'Antibiotic Contamination', 'Anomaly'],
         datasets: [{
             data: classCounts,
-            backgroundColor: ['#059669', '#d97706', '#7c3aed', '#dc2626'],
+            backgroundColor: ['#059669', '#d97706', '#4f46e5', '#dc2626'],
             borderWidth: 0,
             hoverOffset: 4
         }]
@@ -318,3 +318,12 @@ async function fetchData() {
 // Initial fetch and set interval loop
 fetchData();
 setInterval(fetchData, 2000);
+
+// --- STARTUP LOADER LOGIC ---
+window.addEventListener('load', () => {
+    // Give a 1.25 second artificial delay for the classy animation to play before hiding
+    setTimeout(() => {
+        const loader = document.getElementById('startup-loader');
+        if (loader) loader.classList.add('loader-hidden');
+    }, 1250);
+});
