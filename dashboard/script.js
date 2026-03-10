@@ -104,7 +104,7 @@ document.getElementById('btn-trigger-retrain').addEventListener('click', async (
 
 // --- CHART THEME ---
 Chart.defaults.color = '#a1a1aa';
-Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
 Chart.defaults.font.size = 11;
 
 const commonOptions = {
@@ -112,20 +112,20 @@ const commonOptions = {
     maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
     scales: {
-        x: { grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false }, ticks: { maxTicksLimit: 8, padding: 10 } },
-        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5], drawBorder: false }, ticks: { padding: 10, precision: 1 } }
+        x: { grid: { color: 'rgba(255, 255, 255, 0.02)', drawBorder: false }, ticks: { maxTicksLimit: 8, padding: 10 } },
+        y: { grid: { color: 'rgba(255, 255, 255, 0.04)', borderDash: [4, 4], drawBorder: false }, ticks: { padding: 10, precision: 1 } }
     },
     plugins: {
         legend: { display: false },
         tooltip: {
-            backgroundColor: 'rgba(24, 24, 27, 0.9)',
-            titleFont: { family: "'Outfit', sans-serif", size: 13 },
-            bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
-            padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1
+            backgroundColor: 'rgba(24, 24, 27, 0.95)',
+            titleFont: { family: "'Inter', sans-serif", size: 13, weight: '600' },
+            bodyFont: { family: "'Inter', sans-serif", size: 12 },
+            padding: 12, cornerRadius: 6, borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1
         }
     },
     animation: { duration: 1000, easing: 'easeOutExpo' },
-    elements: { line: { tension: 0.4, borderWidth: 3 }, point: { radius: 0, hitRadius: 10, hoverRadius: 6, hoverBorderWidth: 3 } }
+    elements: { line: { tension: 0.2, borderWidth: 1.5 }, point: { radius: 0, hitRadius: 10, hoverRadius: 4, hoverBorderWidth: 2 } }
 };
 
 function createGradient(ctx, colorStart, colorEnd) {
@@ -136,45 +136,45 @@ function createGradient(ctx, colorStart, colorEnd) {
 }
 
 const turbidityCtx = document.getElementById('turbidityChart').getContext('2d');
-const turbGradient = createGradient(turbidityCtx, 'rgba(59, 130, 246, 0.4)', 'rgba(59, 130, 246, 0.0)');
+const turbGradient = createGradient(turbidityCtx, 'rgba(37, 99, 235, 0.15)', 'rgba(37, 99, 235, 0.0)');
 
 const turbidityChart = new Chart(turbidityCtx, {
     type: 'line',
     data: {
         labels: [],
-        datasets: [{ label: 'Turbidity (NTU)', data: [], borderColor: '#3b82f6', backgroundColor: turbGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#3b82f6', fill: true }]
+        datasets: [{ label: 'Turbidity (NTU)', data: [], borderColor: '#2563eb', backgroundColor: turbGradient, pointBackgroundColor: '#111113', pointBorderColor: '#2563eb', fill: true }]
     },
     options: commonOptions
 });
 
 const tdsCtx = document.getElementById('tdsChart').getContext('2d');
-const tdsGradient = createGradient(tdsCtx, 'rgba(16, 185, 129, 0.4)', 'rgba(16, 185, 129, 0.0)');
+const tdsGradient = createGradient(tdsCtx, 'rgba(5, 150, 105, 0.15)', 'rgba(5, 150, 105, 0.0)');
 
 const tdsChart = new Chart(tdsCtx, {
     type: 'line',
     data: {
         labels: [],
-        datasets: [{ label: 'TDS (ppm)', data: [], borderColor: '#10b981', backgroundColor: tdsGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#10b981', fill: true }]
+        datasets: [{ label: 'TDS (ppm)', data: [], borderColor: '#059669', backgroundColor: tdsGradient, pointBackgroundColor: '#111113', pointBorderColor: '#059669', fill: true }]
     },
     options: commonOptions
 });
 
 const phCtx = document.getElementById('phChart').getContext('2d');
-const phGradient = createGradient(phCtx, 'rgba(168, 85, 247, 0.4)', 'rgba(168, 85, 247, 0.0)');
+const phGradient = createGradient(phCtx, 'rgba(124, 58, 237, 0.15)', 'rgba(124, 58, 237, 0.0)');
 const phChart = new Chart(phCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#a855f7', backgroundColor: phGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#a855f7', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#7c3aed', backgroundColor: phGradient, pointBackgroundColor: '#111113', pointBorderColor: '#7c3aed', fill: true }] }, options: commonOptions
 });
 
 const tempCtx = document.getElementById('tempChart').getContext('2d');
-const tempGradient = createGradient(tempCtx, 'rgba(239, 68, 68, 0.4)', 'rgba(239, 68, 68, 0.0)');
+const tempGradient = createGradient(tempCtx, 'rgba(220, 38, 38, 0.15)', 'rgba(220, 38, 38, 0.0)');
 const tempChart = new Chart(tempCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#ef4444', backgroundColor: tempGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#ef4444', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#dc2626', backgroundColor: tempGradient, pointBackgroundColor: '#111113', pointBorderColor: '#dc2626', fill: true }] }, options: commonOptions
 });
 
 const spikeCtx = document.getElementById('spikeChart').getContext('2d');
-const spikeGradient = createGradient(spikeCtx, 'rgba(249, 115, 22, 0.4)', 'rgba(249, 115, 22, 0.0)');
+const spikeGradient = createGradient(spikeCtx, 'rgba(217, 119, 6, 0.15)', 'rgba(217, 119, 6, 0.0)');
 const spikeChart = new Chart(spikeCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'Spike Risk (%)', data: [], borderColor: '#f97316', backgroundColor: spikeGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#f97316', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'Spike Risk (%)', data: [], borderColor: '#d97706', backgroundColor: spikeGradient, pointBackgroundColor: '#111113', pointBorderColor: '#d97706', fill: true }] }, options: commonOptions
 });
 
 const pieCtx = document.getElementById('classPieChart').getContext('2d');
@@ -185,15 +185,15 @@ const classPieChart = new Chart(pieCtx, {
         labels: ['Normal Water', 'Packaging Residue', 'Antibiotic Contamination', 'Anomaly'],
         datasets: [{
             data: classCounts,
-            backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
+            backgroundColor: ['#059669', '#d97706', '#7c3aed', '#dc2626'],
             borderWidth: 0,
             hoverOffset: 4
         }]
     },
     options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)' } },
-        cutout: '70%'
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.95)' } },
+        cutout: '75%'
     }
 });
 
