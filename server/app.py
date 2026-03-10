@@ -5,6 +5,8 @@ import dl_model
 from data_buffer import DataBuffer
 from decision_engine import get_action
 import time
+import math
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -52,15 +54,21 @@ def receive_sensor_data():
     # 3. Decision Engine determines the action
     action = get_action(ml_result, spike_prob)
     
-    # 4. Update the global state
+    # Filter NaNs for strict JSON compliance
+    s_ph = float(data["ph"])
+    s_tds = float(data["tds"])
+    s_turb = float(data["turbidity"])
+    s_temp = float(data["temperature"])
+    s_prob = float(round(spike_prob, 4))
+    
     latest_state.update({
-        "ph": float(data["ph"]),
-        "tds": float(data["tds"]),
-        "turbidity": float(data["turbidity"]),
-        "temperature": float(data["temperature"]),
+        "ph": 0.0 if math.isnan(s_ph) else s_ph,
+        "tds": 0.0 if math.isnan(s_tds) else s_tds,
+        "turbidity": 0.0 if math.isnan(s_turb) else s_turb,
+        "temperature": 0.0 if math.isnan(s_temp) else s_temp,
         "classification": str(ml_result["status"]),
         "anomaly": bool(ml_result["anomaly"]),
-        "spike_probability": float(round(spike_prob, 4)),
+        "spike_probability": 0.0 if math.isnan(s_prob) else s_prob,
         "treatment_action": str(action),
         "timestamp": float(time.time())
     })
@@ -74,6 +82,37 @@ def get_latest():
 @app.route('/actuator-command', methods=['GET'])
 def actuator_command():
     return jsonify({"command": latest_state["treatment_action"]}), 200
+
+@app.route('/feedback', methods=['POST'])
+def receive_feedback():
+    data = request.json
+    if not data or "label" not in data:
+        return jsonify({"error": "Invalid request"}), 400
+    
+    required = ["ph", "tds", "turbidity", "temperature", "label"]
+    if not all(k in data for k in required):
+        return jsonify({"error": "Missing data"}), 400
+        
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "..", "dataset", "verified_data.csv")
+    exists = os.path.exists(csv_path)
+    
+    with open(csv_path, 'a') as f:
+        if not exists:
+            f.write("ph,tds,turbidity,temperature,label\n")
+        f.write(f"{data['ph']},{data['tds']},{data['turbidity']},{data['temperature']},{data['label']}\n")
+    
+    return jsonify({"message": "Feedback saved successfully"}), 200
+
+@app.route('/retrain', methods=['POST'])
+def retrain_models():
+    ml_success = ml_model.retrain_classifier()
+    dl_success = dl_model.retrain_lstm()
+    
+    if ml_success and dl_success:
+        return jsonify({"message": "Models successfully retrained and hot-reloaded"}), 200
+    else:
+        return jsonify({"error": "Retraining failed"}), 500
 
 if __name__ == '__main__':
     ml_model.load_models()

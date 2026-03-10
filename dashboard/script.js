@@ -1,4 +1,5 @@
 const API_URL = 'http://127.0.0.1:5000/latest';
+const API_BASE = 'http://127.0.0.1:5000';
 
 let globalDataLog = []; // Stores history for CSV export
 
@@ -65,6 +66,42 @@ document.getElementById('btn-export').addEventListener('click', function () {
     document.body.removeChild(link);
 });
 
+// --- CONTINUOUS LEARNING / FEEDBACK LOGIC ---
+document.getElementById('btn-submit-feedback').addEventListener('click', async () => {
+    if (globalDataLog.length === 0) return alert("System hasn't recorded any data yet to verify!");
+    const currentData = globalDataLog[globalDataLog.length - 1];
+    const lbl = document.getElementById('sel-feedback').value;
+
+    const payload = {
+        ph: currentData.ph,
+        tds: currentData.tds,
+        turbidity: currentData.turbidity,
+        temperature: currentData.temperature,
+        label: parseInt(lbl)
+    };
+
+    try {
+        const res = await fetch(`${API_BASE}/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) alert("Hit verified and saved to the persistent continuous learning buffer!");
+        else alert("Failed to save feedback.");
+    } catch (e) { console.error(e); }
+});
+
+document.getElementById('btn-trigger-retrain').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-trigger-retrain');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Retraining...';
+    try {
+        const res = await fetch(`${API_BASE}/retrain`, { method: 'POST' });
+        if (res.ok) alert("Neural Nets and ML Classifiers successfully hot-swapped!");
+        else alert("Failed to retrain models.");
+    } catch (e) { console.error(e); }
+    btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Retrain Models';
+});
+
 // --- CHART THEME ---
 Chart.defaults.color = '#a1a1aa';
 Chart.defaults.font.family = "'JetBrains Mono', monospace";
@@ -120,6 +157,44 @@ const tdsChart = new Chart(tdsCtx, {
         datasets: [{ label: 'TDS (ppm)', data: [], borderColor: '#10b981', backgroundColor: tdsGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#10b981', fill: true }]
     },
     options: commonOptions
+});
+
+const phCtx = document.getElementById('phChart').getContext('2d');
+const phGradient = createGradient(phCtx, 'rgba(168, 85, 247, 0.4)', 'rgba(168, 85, 247, 0.0)');
+const phChart = new Chart(phCtx, {
+    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#a855f7', backgroundColor: phGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#a855f7', fill: true }] }, options: commonOptions
+});
+
+const tempCtx = document.getElementById('tempChart').getContext('2d');
+const tempGradient = createGradient(tempCtx, 'rgba(239, 68, 68, 0.4)', 'rgba(239, 68, 68, 0.0)');
+const tempChart = new Chart(tempCtx, {
+    type: 'line', data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#ef4444', backgroundColor: tempGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#ef4444', fill: true }] }, options: commonOptions
+});
+
+const spikeCtx = document.getElementById('spikeChart').getContext('2d');
+const spikeGradient = createGradient(spikeCtx, 'rgba(249, 115, 22, 0.4)', 'rgba(249, 115, 22, 0.0)');
+const spikeChart = new Chart(spikeCtx, {
+    type: 'line', data: { labels: [], datasets: [{ label: 'Spike Risk (%)', data: [], borderColor: '#f97316', backgroundColor: spikeGradient, pointBackgroundColor: '#09090b', pointBorderColor: '#f97316', fill: true }] }, options: commonOptions
+});
+
+const pieCtx = document.getElementById('classPieChart').getContext('2d');
+let classCounts = [0, 0, 0, 0];
+const classPieChart = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Normal Water', 'Packaging Residue', 'Antibiotic Contamination', 'Anomaly'],
+        datasets: [{
+            data: classCounts,
+            backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)' } },
+        cutout: '70%'
+    }
 });
 
 const maxDataPoints = 30;
@@ -186,19 +261,39 @@ function updateDashboard(data) {
     // Chart Appends
     turbidityChart.data.labels.push(nowStr);
     turbidityChart.data.datasets[0].data.push(data.turbidity);
-    if (turbidityChart.data.labels.length > maxDataPoints) {
-        turbidityChart.data.labels.shift();
-        turbidityChart.data.datasets[0].data.shift();
-    }
+    if (turbidityChart.data.labels.length > maxDataPoints) { turbidityChart.data.labels.shift(); turbidityChart.data.datasets[0].data.shift(); }
     turbidityChart.update();
 
     tdsChart.data.labels.push(nowStr);
     tdsChart.data.datasets[0].data.push(data.tds);
-    if (tdsChart.data.labels.length > maxDataPoints) {
-        tdsChart.data.labels.shift();
-        tdsChart.data.datasets[0].data.shift();
-    }
+    if (tdsChart.data.labels.length > maxDataPoints) { tdsChart.data.labels.shift(); tdsChart.data.datasets[0].data.shift(); }
     tdsChart.update();
+
+    phChart.data.labels.push(nowStr);
+    phChart.data.datasets[0].data.push(data.ph);
+    if (phChart.data.labels.length > maxDataPoints) { phChart.data.labels.shift(); phChart.data.datasets[0].data.shift(); }
+    phChart.update();
+
+    tempChart.data.labels.push(nowStr);
+    tempChart.data.datasets[0].data.push(data.temperature);
+    if (tempChart.data.labels.length > maxDataPoints) { tempChart.data.labels.shift(); tempChart.data.datasets[0].data.shift(); }
+    tempChart.update();
+
+    spikeChart.data.labels.push(nowStr);
+    spikeChart.data.datasets[0].data.push(prob);
+    if (spikeChart.data.labels.length > maxDataPoints) { spikeChart.data.labels.shift(); spikeChart.data.datasets[0].data.shift(); }
+    spikeChart.update();
+
+    // Pie Chart Appends
+    if (data.classification !== "Waiting for data...") {
+        let idx = 0;
+        if (data.anomaly) idx = 3;
+        else if (data.classification === 'Normal Water') idx = 0;
+        else if (data.classification === 'Packaging Residue') idx = 1;
+        else idx = 2;
+        classCounts[idx]++;
+        classPieChart.update();
+    }
 }
 
 async function fetchData() {

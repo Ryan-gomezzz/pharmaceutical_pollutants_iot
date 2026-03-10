@@ -111,6 +111,32 @@
                             </div>
                         </section>
 
+                        <!-- Continuous Learning Feedback Row -->
+                        <section class="feedback-row" style="display:flex; gap:1rem; margin-bottom:1.5rem;">
+                            <div class="glass-card full-width"
+                                style="display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem;">
+                                <div>
+                                    <h3 style="margin-bottom:0.2rem;"><i
+                                            class="fa-solid fa-graduation-cap text-purple"></i> Continuous Learning</h3>
+                                    <p class="subtitle" style="margin:0;">Validate the current AI prediction or correct
+                                        it to expand the dataset.</p>
+                                </div>
+                                <div style="display:flex; gap:0.5rem; align-items:center;">
+                                    <select id="sel-feedback" class="input-element" style="width:auto; padding:0.5rem;">
+                                        <option value="0">Normal Water</option>
+                                        <option value="1">Packaging Residue</option>
+                                        <option value="2">Antibiotic Contamination</option>
+                                        <option value="3">Anomaly</option>
+                                    </select>
+                                    <button id="btn-submit-feedback" class="btn btn-primary"><i
+                                            class="fa-solid fa-check-double"></i> Submit Hit</button>
+                                    <button id="btn-trigger-retrain" class="btn btn-primary"
+                                        style="background:#8b5cf6;"><i class="fa-solid fa-arrows-rotate"></i> Retrain
+                                        Models</button>
+                                </div>
+                            </div>
+                        </section>
+
                         <!-- Raw Telemetry Row -->
                         <section class="telemetry-row">
                             <div class="glass-card sensor-card">
@@ -151,13 +177,12 @@
                             </div>
                         </section>
 
-                        <!-- Charting Row -->
-                        <section class="charts-row">
+                        <!-- Charting Row 1 -->
+                        <section class="charts-row mb-4">
                             <div class="glass-card chart-container">
                                 <div class="chart-header">
                                     <div>
-                                        <h3><i class="fa-solid fa-chart-area text-blue"></i> Turbidity Temporal Trend
-                                        </h3>
+                                        <h3><i class="fa-solid fa-chart-area text-blue"></i> Turbidity Trend</h3>
                                         <p class="subtitle">Last 30 inferences</p>
                                     </div>
                                 </div>
@@ -169,12 +194,68 @@
                             <div class="glass-card chart-container">
                                 <div class="chart-header">
                                     <div>
-                                        <h3><i class="fa-solid fa-chart-area text-green"></i> TDS Temporal Trend</h3>
+                                        <h3><i class="fa-solid fa-chart-area text-green"></i> TDS Trend</h3>
                                         <p class="subtitle">Last 30 inferences</p>
                                     </div>
                                 </div>
                                 <div class="canvas-wrapper">
                                     <canvas id="tdsChart"></canvas>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Charting Row 2 -->
+                        <section class="charts-row">
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-chart-line text-purple"></i> pH Level</h3>
+                                        <p class="subtitle">Last 30 inferences</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="phChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-chart-line text-red"></i> Temperature</h3>
+                                        <p class="subtitle">Last 30 inferences</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="tempChart"></canvas>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Charting Row 3 -->
+                        <section class="charts-row" style="margin-top: 1.5rem;">
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-clock-rotate-left text-orange"></i> LSTM Spike Risk
+                                        </h3>
+                                        <p class="subtitle">Predictive trajectory</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="spikeChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-card chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h3><i class="fa-solid fa-chart-pie text-blue"></i> Validation Distribution</h3>
+                                        <p class="subtitle">Cumulative class assignments</p>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper"
+                                    style="display:flex; justify-content:center; align-items:center;">
+                                    <canvas id="classPieChart" style="max-height: 200px;"></canvas>
                                 </div>
                             </div>
                         </section>

@@ -60,3 +60,52 @@ def predict_spike(raw_buffer):
     if prob > 1: prob = 1.0
     
     return float(prob)
+
+def retrain_lstm():
+    global model, scaler
+    import pandas as pd
+    from sklearn.preprocessing import MinMaxScaler
+    
+    base_dir = os.path.dirname(__file__)
+    main_csv = os.path.join(base_dir, "..", "dataset", "pollution_data.csv")
+    verified_csv = os.path.join(base_dir, "..", "dataset", "verified_data.csv")
+    
+    try:
+        data = pd.read_csv(main_csv)
+        if os.path.exists(verified_csv):
+            new_data = pd.read_csv(verified_csv)
+            data = pd.concat([data, new_data], ignore_index=True)
+            
+        features = data[['ph','tds','turbidity','temperature']].values
+        
+        new_scaler = MinMaxScaler()
+        features = new_scaler.fit_transform(features)
+        
+        sequence_length = 10
+        X = []
+        y = []
+        for i in range(len(features)-sequence_length):
+            X.append(features[i:i+sequence_length])
+            y.append(features[i+sequence_length][2]) # predict turbidity
+            
+        X = np.array(X)
+        y = np.array(y)
+        
+        if model is None:
+            load_model()
+            
+        # Fit 1 epoch dynamically adjusting weights without destroying previous history
+        model.fit(X, y, epochs=1, batch_size=32, verbose=0)
+        
+        model_path = os.path.join(base_dir, "..", "models", "lstm_model.keras")
+        scaler_path = os.path.join(base_dir, "..", "models", "scaler.pkl")
+        
+        model.save(model_path)
+        joblib.dump(new_scaler, scaler_path)
+        
+        scaler = new_scaler
+        print("DL Model retrained and hot-swapped successfully.")
+        return True
+    except Exception as e:
+        print(f"Error retraining DL model: {e}")
+        return False
