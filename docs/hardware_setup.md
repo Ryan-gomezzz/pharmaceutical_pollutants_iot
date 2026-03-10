@@ -17,9 +17,9 @@ The pH, TDS, and Turbidity sensor probes output analog voltages. **If your senso
 | pH            | GPIO 34   | `5V OUT` (Stepped Down)  | `GND`    |
 | TDS           | GPIO 35   | `5V OUT` (Stepped Down)  | `GND`    |
 | Turbidity     | GPIO 32   | `5V OUT` (Stepped Down)  | `GND`    |
-| DS18B20 (Temp)| GPIO 4    | 3.3V  | `GND`    |
+| DHT11 (Temp)  | GPIO 4    | 3.3V  | `GND`    |
 
-*Critical Note: The `DS18B20` temperature sensor operates on the 1-Wire bus and strictly requires a `4.7kΩ` pull-up resistor bridging its `Data` (GPIO 4) and `VCC` (3.3V) lines.*
+*Critical Note: If using a bare `DHT11` sensor (not a pre-mounted module board), it strictly requires a `4.7kΩ` to `10kΩ` pull-up resistor bridging its `Data` (GPIO 4) and `VCC` (3.3V) lines.*
 
 ---
 
@@ -64,7 +64,7 @@ graph TD
         S_PH[pH Sensor Module]:::sensor
         S_TDS[TDS Module]:::sensor
         S_TURB[Turbidity Module]:::sensor
-        S_TEMP[DS18B20 Temp Probe]:::sensor
+        S_TEMP[DHT11 Temp Probe]:::sensor
     end
 
     subgraph Safety & Division

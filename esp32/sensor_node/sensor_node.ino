@@ -1,7 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include <DHT.h>
 
 const char* WIFI_SSID = "YOUR_WIFI_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
@@ -12,8 +11,8 @@ const char* SERVER_URL = "http://192.168.1.100:5000/sensor-data"; // Replace wit
 #define TURBIDITY_PIN 32
 #define TEMP_PIN 4
 
-OneWire oneWire(TEMP_PIN);
-DallasTemperature sensors(&oneWire);
+#define DHTTYPE DHT11
+DHT dht(TEMP_PIN, DHTTYPE);
 
 void setup() {
   Serial.begin(115200);
@@ -28,7 +27,7 @@ void setup() {
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
   
-  sensors.begin();
+  dht.begin();
 }
 
 void loop() {
@@ -37,8 +36,11 @@ void loop() {
     float tds = analogRead(TDS_PIN) * 0.5;
     float turbidity = analogRead(TURBIDITY_PIN) * 0.1;
     
-    sensors.requestTemperatures(); 
-    float temperature = sensors.getTempCByIndex(0);
+    float temperature = dht.readTemperature();
+    if (isnan(temperature)) {
+      Serial.println("Failed to read from DHT sensor!");
+      temperature = 0.0; // Fallback
+    }
 
     String payload = "{";
     payload += "\"node\": \"sensor_node\",";
