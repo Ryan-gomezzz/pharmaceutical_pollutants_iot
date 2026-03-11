@@ -136,17 +136,16 @@
                         </section>
 
                         <!-- Continuous Learning Feedback Row -->
-                        <section class="feedback-row" style="display:flex; gap:1rem; margin-bottom:1.5rem;">
-                            <div class="glass-card full-width"
-                                style="display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem;">
+                        <section class="feedback-row">
+                            <div class="glass-card full-width feedback-card">
                                 <div>
                                     <h3 style="margin-bottom:0.2rem;"><i
                                             class="fa-solid fa-graduation-cap text-indigo"></i> Continuous Learning</h3>
                                     <p class="subtitle" style="margin:0;">Validate the current AI prediction or correct
                                         it to expand the dataset.</p>
                                 </div>
-                                <div style="display:flex; gap:0.5rem; align-items:center;">
-                                    <select id="sel-feedback" class="input-element" style="width:auto; padding:0.5rem;">
+                                <div class="feedback-controls">
+                                    <select id="sel-feedback" class="input-element">
                                         <option value="0">Normal Water</option>
                                         <option value="1">Packaging Residue</option>
                                         <option value="2">Antibiotic Contamination</option>
@@ -288,9 +287,8 @@
 
                 <!-- NODES VIEW -->
                 <div id="view-nodes" class="view-section">
-                    <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem;">
-                        <img src="assets/node.png" alt="Hardware Node Spec"
-                            style="width: 320px; border-radius: var(--border-radius-lg); object-fit: cover; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <div class="nodes-layout">
+                        <img src="assets/node.png" alt="Hardware Node Spec">
                         <div class="glass-card full-width" style="margin-bottom: 0;">
                             <div class="card-header">
                                 <i class="fa-solid fa-network-wired text-blue"></i>

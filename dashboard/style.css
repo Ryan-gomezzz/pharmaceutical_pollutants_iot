@@ -392,10 +392,16 @@ body {
 }
 
 .badge {
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    width: fit-content;
 }
 
 .badge-blue {
@@ -826,6 +832,195 @@ input:checked+.slider:before {
     }
 
     .grid-2-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- RESPONSIVE MOBILE LAYOUT --- */
+
+/* Utility Classes moved from HTML */
+.nodes-layout {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.nodes-layout img {
+    width: 320px;
+    border-radius: var(--border-radius-lg);
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.feedback-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.75rem;
+}
+
+.feedback-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+
+    /* Main Layout */
+    .app-container {
+        flex-direction: column;
+    }
+
+    /* Convert Sidebar to Bottom Navigation Bar */
+    .sidebar {
+        width: 100%;
+        height: 70px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        flex-direction: row;
+        padding: 0.5rem;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-surface);
+        z-index: 1000;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .brand,
+    .system-status {
+        display: none;
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+        gap: 0;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.7rem;
+        padding: 0.5rem;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .nav-item i {
+        font-size: 1.25rem;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-top: none;
+        background: var(--bg-surface-hover);
+        color: var(--accent-blue);
+    }
+
+    /* Adjust Main Content to not underlap the bottom nav */
+    .main-content {
+        margin-left: 0;
+        padding: 1.5rem 1rem;
+        padding-bottom: 90px;
+    }
+
+    /* Top Header Adjustments */
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .header-left h1 {
+        font-size: 1.75rem;
+    }
+
+    .timestamp {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Grid Stacking */
+    .ai-intelligence-row,
+    .charts-row,
+    .grid-3-col {
+        grid-template-columns: 1fr;
+    }
+
+    .telemetry-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    /* Image Wrapper Adjustments */
+    .nodes-layout {
+        flex-direction: column;
+    }
+
+    .nodes-layout img {
+        width: 100%;
+        height: 200px;
+    }
+
+    /* Hardware Table Adjustments */
+    .table-responsive {
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Feedback Machine Learning Bar */
+    .feedback-card {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+
+    .feedback-controls {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .feedback-controls select,
+    .feedback-controls button {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* Actuation List Adjustments */
+    .control-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .switch {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .telemetry-row {
         grid-template-columns: 1fr;
     }
 }
