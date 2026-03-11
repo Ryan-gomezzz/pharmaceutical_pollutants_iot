@@ -392,16 +392,17 @@ body {
 }
 
 .badge {
-    padding: 0.35rem 0.75rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    display: inline-block;
     white-space: nowrap;
-    width: fit-content;
+    text-align: center;
+}
+
+.badge i {
+    margin-right: 4px;
 }
 
 .badge-blue {
@@ -606,6 +607,7 @@ body {
 .data-table td {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
 }
 
 .data-table th {
