@@ -619,10 +619,24 @@ body {
     gap: 1.5rem;
 }
 
+.grid-2-col>.glass-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.grid-2-col .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .actuator-control-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    flex: 1;
+    justify-content: space-between;
 }
 
 .control-item {
@@ -720,6 +734,8 @@ input:checked+.slider:before {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    flex: 1;
+    justify-content: space-between;
 }
 
 .rules-list li {
