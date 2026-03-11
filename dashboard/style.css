@@ -392,17 +392,22 @@ body {
 }
 
 .badge {
-    padding: 0.2rem 0.6rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: 600;
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     white-space: nowrap;
-    text-align: center;
+    width: max-content;
+    line-height: 1;
 }
 
 .badge i {
-    margin-right: 4px;
+    margin: 0;
 }
 
 .badge-blue {
@@ -642,9 +647,7 @@ body {
 .actuator-control-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    flex: 1;
-    justify-content: space-between;
+    gap: 1.25rem;
 }
 
 .control-item {
@@ -741,9 +744,7 @@ input:checked+.slider:before {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    flex: 1;
-    justify-content: space-between;
+    gap: 1.25rem;
 }
 
 .rules-list li {
@@ -845,14 +846,25 @@ input:checked+.slider:before {
     display: flex;
     gap: 1.5rem;
     margin-bottom: 2rem;
+    align-items: stretch;
 }
 
-.nodes-layout img {
-    width: 320px;
+.node-img-wrapper {
+    flex: 0 0 320px;
+    position: relative;
     border-radius: var(--border-radius-lg);
-    object-fit: cover;
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.node-img-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .feedback-row {
@@ -863,15 +875,24 @@ input:checked+.slider:before {
 
 .feedback-card {
     display: flex;
-    align-items: center;
+    flex-direction: row !important;
+    align-items: center !important;
     justify-content: space-between;
+    flex-wrap: nowrap;
     padding: 1rem 1.75rem;
 }
 
 .feedback-controls {
     display: flex;
-    gap: 0.5rem;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.75rem;
     align-items: center;
+}
+
+.feedback-controls .btn,
+.feedback-controls .input-element {
+    width: auto !important;
 }
 
 @media (max-width: 768px) {
@@ -977,7 +998,8 @@ input:checked+.slider:before {
         flex-direction: column;
     }
 
-    .nodes-layout img {
+    .node-img-wrapper {
+        flex: auto;
         width: 100%;
         height: 200px;
     }
