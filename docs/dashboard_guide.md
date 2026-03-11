@@ -1,6 +1,6 @@
-# SensiFluid Dashboard - UI/UX Documentation
+# PokeLab Dashboard - UI/UX Documentation
 
-The SensiFluid Dashboard has been upgraded into a modern, responsive Single Page Application (SPA). This document outlines the purpose and functionality of each navigational tab within the interface.
+The PokeLab Dashboard has been upgraded into a modern, responsive Single Page Application (SPA). This document outlines the purpose and functionality of each navigational tab within the interface.
 
 ## 1. 📊 Dashboard (Real-time Analytics)
 **Purpose:** The primary command center. Provides an instant, high-level overview of the entire system's current status based on the latest telemetry stream.
