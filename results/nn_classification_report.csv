@@ -1,0 +1,7 @@
+,precision,recall,f1-score,support
+Normal Water,0.9975,1.0,0.9988,1200.0
+Possible Contamination,0.8495,0.982,0.9109,500.0
+Severe Contamination,0.9726,0.71,0.8208,300.0
+accuracy,0.952,0.952,0.952,0.952
+macro avg,0.9399,0.8973,0.9102,2000.0
+weighted avg,0.9568,0.952,0.9501,2000.0
