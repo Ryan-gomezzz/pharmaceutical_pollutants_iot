@@ -331,9 +331,42 @@ async function fetchData() {
     }
 }
 
+async function fetchNodeStatus() {
+    try {
+        const response = await fetch(`${API_BASE}/node-status`);
+        if (response.ok) {
+            const data = await response.json();
+
+            // Sensor Node Update
+            const sNode = data.sensor_node;
+            document.getElementById('status-sensor-node').innerHTML = sNode.online
+                ? '<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Active</span>'
+                : '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+            document.getElementById('ip-sensor-node').innerText = sNode.online ? sNode.ip : '-';
+            document.getElementById('reads-sensor-node').innerText = sNode.readings + ' reqs';
+
+            // Actuator Node Update
+            const aNode = data.actuator_node;
+            document.getElementById('status-actuator-node').innerHTML = aNode.online
+                ? '<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Active</span>'
+                : '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+            document.getElementById('ip-actuator-node').innerText = aNode.online ? aNode.ip : '-';
+            document.getElementById('reads-actuator-node').innerText = aNode.readings + ' reqs';
+        }
+    } catch (e) {
+        // Backend down, marking nodes offline
+        document.getElementById('status-sensor-node').innerHTML = '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+        document.getElementById('status-actuator-node').innerHTML = '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+    }
+}
+
 // Initial fetch and set interval loop
 fetchData();
-setInterval(fetchData, 2000);
+fetchNodeStatus();
+setInterval(() => {
+    fetchData();
+    fetchNodeStatus();
+}, 2000);
 
 // --- MANUAL OVERRIDE TOGGLE LOGIC ---
 const overrideToggles = ['chk-pump', 'chk-uv', 'chk-elec', 'chk-pre'];

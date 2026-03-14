@@ -13,6 +13,12 @@ CORS(app)
 
 sensor_buffer = DataBuffer(size=10)
 
+# ─── Node Connection Tracking ────────────────────────────────
+node_registry = {
+    "sensor_node": {"last_seen": 0, "ip": "", "readings": 0},
+    "actuator_node": {"last_seen": 0, "ip": "", "readings": 0}
+}
+
 latest_state = {
     "ph": 0.0,
     "tds": 0.0,
@@ -36,6 +42,12 @@ def receive_sensor_data():
     required = ["ph", "tds", "turbidity", "temperature"]
     if not all(k in data for k in required):
         return jsonify({"error": "Missing data"}), 400
+
+    # Track sensor node connection
+    node_registry["sensor_node"]["last_seen"] = time.time()
+    node_registry["sensor_node"]["ip"] = request.remote_addr
+    node_registry["sensor_node"]["readings"] += 1
+    print(f"[Node] Sensor node connected from {request.remote_addr} (reading #{node_registry['sensor_node']['readings']})")
 
     # 1. Run Machine Learning models (Anomaly + Classification)
     ml_result = ml_model.predict(
@@ -116,8 +128,31 @@ def set_manual_override():
 def get_manual_override():
     return jsonify(manual_override), 200
 
+@app.route('/node-status', methods=['GET'])
+def get_node_status():
+    now = time.time()
+    # Consider node online if seen in the last 15 seconds
+    status = {
+        "sensor_node": {
+            "online": (now - node_registry["sensor_node"]["last_seen"]) < 15,
+            "ip": node_registry["sensor_node"]["ip"],
+            "readings": node_registry["sensor_node"]["readings"]
+        },
+        "actuator_node": {
+            "online": (now - node_registry["actuator_node"]["last_seen"]) < 15,
+            "ip": node_registry["actuator_node"]["ip"],
+            "readings": node_registry["actuator_node"]["readings"]
+        }
+    }
+    return jsonify(status), 200
+
 @app.route('/actuator-command', methods=['GET'])
 def actuator_command():
+    # Track actuator node connection
+    node_registry["actuator_node"]["last_seen"] = time.time()
+    node_registry["actuator_node"]["ip"] = request.remote_addr
+    node_registry["actuator_node"]["readings"] += 1
+    
     if manual_override["active"]:
         return jsonify({"command": manual_override["command"], "mode": "manual"}), 200
     return jsonify({"command": latest_state["treatment_action"], "mode": "auto"}), 200
