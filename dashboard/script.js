@@ -438,8 +438,14 @@ function applyChartTheme(isLight) {
 
     allCharts.forEach(chart => {
         if (chart.options.scales) {
-            if (chart.options.scales.x) chart.options.scales.x.grid.color = gridColorX;
-            if (chart.options.scales.y) chart.options.scales.y.grid.color = gridColorY;
+            if (chart.options.scales.x) {
+                chart.options.scales.x.grid.color = gridColorX;
+                chart.options.scales.x.ticks.color = textColor;
+            }
+            if (chart.options.scales.y) {
+                chart.options.scales.y.grid.color = gridColorY;
+                chart.options.scales.y.ticks.color = textColor;
+            }
         }
         if (chart.options.plugins && chart.options.plugins.tooltip) {
             chart.options.plugins.tooltip.backgroundColor = tooltipBg;

@@ -46,6 +46,37 @@
     --border-highlight: rgba(0, 0, 0, 0.2);
 }
 
+/* Light Mode Specific Overrides */
+[data-theme="light"] .control-item,
+[data-theme="light"] .rules-list li,
+[data-theme="light"] .input-element {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .data-table th,
+[data-theme="light"] p,
+[data-theme="light"] .sensor-label,
+[data-theme="light"] .sensor-data .unit {
+    color: #334155;
+    font-weight: 500;
+}
+
+[data-theme="light"] .system-status {
+    background: #f1f5f9;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .nav-item.active {
+    background: rgba(37, 99, 235, 0.08);
+    border-left: 3px solid #2563eb;
+}
+
+[data-theme="light"] .badge-slate {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
 * {
     margin: 0;
     padding: 0;
