@@ -31,6 +31,20 @@ latest_state = {
     "timestamp": 0
 }
 
+# ─── EMA Smoothing Filter ─────────────────────────────────────
+# Alpha controls smoothing strength. Lower = smoother but slower.
+# 0.25 provides strong noise reduction while retaining real trends.
+EMA_ALPHA = 0.25
+_ema_state = {"ph": None, "tds": None, "turbidity": None, "temperature": None}
+
+def apply_ema(key, new_val):
+    """Return the EMA-smoothed value for the given sensor key."""
+    if _ema_state[key] is None:
+        _ema_state[key] = new_val
+    else:
+        _ema_state[key] = EMA_ALPHA * new_val + (1 - EMA_ALPHA) * _ema_state[key]
+    return round(_ema_state[key], 4)
+
 @app.route('/sensor-data', methods=['POST'])
 def receive_sensor_data():
     global latest_state
@@ -49,14 +63,17 @@ def receive_sensor_data():
     node_registry["sensor_node"]["readings"] += 1
     print(f"[Node] Sensor node connected from {request.remote_addr} (reading #{node_registry['sensor_node']['readings']})")
 
+    # ─── Apply EMA smoothing to raw sensor readings ──────────
+    ph_s    = apply_ema("ph",           float(data["ph"]))
+    tds_s   = apply_ema("tds",          float(data["tds"]))
+    turb_s  = apply_ema("turbidity",    float(data["turbidity"]))
+    temp_s  = apply_ema("temperature",  float(data["temperature"]))
+
     # 1. Run Machine Learning models (Anomaly + Classification)
-    ml_result = ml_model.predict(
-        data["ph"], data["tds"], data["turbidity"], 
-        data["temperature"]
-    )
+    ml_result = ml_model.predict(ph_s, tds_s, turb_s, temp_s)
     
     # 2. Update buffer and run Deep Learning model
-    reading = [data["ph"], data["tds"], data["turbidity"], data["temperature"]]
+    reading = [ph_s, tds_s, turb_s, temp_s]
     sensor_buffer.append(reading)
     
     spike_prob = 0.0
@@ -66,11 +83,11 @@ def receive_sensor_data():
     # 3. Decision Engine determines the action
     action = get_action(ml_result, spike_prob)
     
-    # Filter NaNs for strict JSON compliance
-    s_ph = float(data["ph"])
-    s_tds = float(data["tds"])
-    s_turb = float(data["turbidity"])
-    s_temp = float(data["temperature"])
+    # Filter NaNs for strict JSON compliance (use smoothed values)
+    s_ph = ph_s
+    s_tds = tds_s
+    s_turb = turb_s
+    s_temp = temp_s
     s_prob = float(round(spike_prob, 4))
     
     latest_state.update({

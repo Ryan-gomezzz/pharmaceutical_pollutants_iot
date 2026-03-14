@@ -125,7 +125,7 @@ const commonOptions = {
         }
     },
     animation: { duration: 1000, easing: 'easeOutExpo' },
-    elements: { line: { tension: 0.2, borderWidth: 1.5 }, point: { radius: 0, hitRadius: 10, hoverRadius: 4, hoverBorderWidth: 2 } }
+    elements: { line: { tension: 0.45, borderWidth: 2 }, point: { radius: 0, hitRadius: 10, hoverRadius: 4, hoverBorderWidth: 2 } }
 };
 
 function createGradient(ctx, colorStart, colorEnd) {
@@ -144,7 +144,7 @@ const turbidityChart = new Chart(turbidityCtx, {
         labels: [],
         datasets: [{ label: 'Turbidity (NTU)', data: [], borderColor: '#2563eb', backgroundColor: turbGradient, pointBackgroundColor: '#111113', pointBorderColor: '#2563eb', fill: true }]
     },
-    options: commonOptions
+    options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, min: 0, max: 100 } } }
 });
 
 const tdsCtx = document.getElementById('tdsChart').getContext('2d');
@@ -156,25 +156,28 @@ const tdsChart = new Chart(tdsCtx, {
         labels: [],
         datasets: [{ label: 'TDS (ppm)', data: [], borderColor: '#059669', backgroundColor: tdsGradient, pointBackgroundColor: '#111113', pointBorderColor: '#059669', fill: true }]
     },
-    options: commonOptions
+    options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, min: 0, max: 800 } } }
 });
 
 const phCtx = document.getElementById('phChart').getContext('2d');
 const phGradient = createGradient(phCtx, 'rgba(79, 70, 229, 0.15)', 'rgba(79, 70, 229, 0.0)');
 const phChart = new Chart(phCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#4f46e5', backgroundColor: phGradient, pointBackgroundColor: '#111113', pointBorderColor: '#4f46e5', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'pH Level', data: [], borderColor: '#4f46e5', backgroundColor: phGradient, pointBackgroundColor: '#111113', pointBorderColor: '#4f46e5', fill: true }] },
+    options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, min: 0, max: 14 } } }
 });
 
 const tempCtx = document.getElementById('tempChart').getContext('2d');
 const tempGradient = createGradient(tempCtx, 'rgba(220, 38, 38, 0.15)', 'rgba(220, 38, 38, 0.0)');
 const tempChart = new Chart(tempCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#dc2626', backgroundColor: tempGradient, pointBackgroundColor: '#111113', pointBorderColor: '#dc2626', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#dc2626', backgroundColor: tempGradient, pointBackgroundColor: '#111113', pointBorderColor: '#dc2626', fill: true }] },
+    options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, min: 10, max: 50 } } }
 });
 
 const spikeCtx = document.getElementById('spikeChart').getContext('2d');
 const spikeGradient = createGradient(spikeCtx, 'rgba(217, 119, 6, 0.15)', 'rgba(217, 119, 6, 0.0)');
 const spikeChart = new Chart(spikeCtx, {
-    type: 'line', data: { labels: [], datasets: [{ label: 'Spike Risk (%)', data: [], borderColor: '#d97706', backgroundColor: spikeGradient, pointBackgroundColor: '#111113', pointBorderColor: '#d97706', fill: true }] }, options: commonOptions
+    type: 'line', data: { labels: [], datasets: [{ label: 'Spike Risk (%)', data: [], borderColor: '#d97706', backgroundColor: spikeGradient, pointBackgroundColor: '#111113', pointBorderColor: '#d97706', fill: true }] },
+    options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, min: 0, max: 100 } } }
 });
 
 const pieCtx = document.getElementById('classPieChart').getContext('2d');
