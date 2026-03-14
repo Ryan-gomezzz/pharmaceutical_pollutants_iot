@@ -422,6 +422,63 @@ document.getElementById('btn-auto-mode').addEventListener('click', async () => {
     } catch (e) { console.error('Auto mode failed:', e); }
 });
 
+// --- LIGHT / DARK THEME TOGGLE LOGIC ---
+const allCharts = [turbidityChart, tdsChart, phChart, tempChart, spikeChart, classPieChart];
+
+function applyChartTheme(isLight) {
+    const textColor = isLight ? '#475569' : '#a1a1aa';
+    const gridColorX = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.02)';
+    const gridColorY = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.04)';
+    const tooltipBg = isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(24, 24, 27, 0.95)';
+    const tooltipTitle = isLight ? '#0f172a' : '#fff';
+    const tooltipBody = isLight ? '#475569' : '#a1a1aa';
+    const tooltipBorder = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)';
+
+    Chart.defaults.color = textColor;
+
+    allCharts.forEach(chart => {
+        if (chart.options.scales) {
+            if (chart.options.scales.x) chart.options.scales.x.grid.color = gridColorX;
+            if (chart.options.scales.y) chart.options.scales.y.grid.color = gridColorY;
+        }
+        if (chart.options.plugins && chart.options.plugins.tooltip) {
+            chart.options.plugins.tooltip.backgroundColor = tooltipBg;
+            chart.options.plugins.tooltip.titleColor = tooltipTitle;
+            chart.options.plugins.tooltip.bodyColor = tooltipBody;
+            chart.options.plugins.tooltip.borderColor = tooltipBorder;
+        }
+        chart.update();
+    });
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+
+    if (isLight) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('theme-icon').className = 'fa-solid fa-sun'; // Sun icon for switching TO light
+        applyChartTheme(false);
+    } else {
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('theme-icon').className = 'fa-solid fa-moon'; // Moon icon for switching TO dark
+        applyChartTheme(true);
+    }
+}
+
+document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
+
+// Initialize theme on load
+if (localStorage.getItem('theme') === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').className = 'fa-solid fa-moon';
+    applyChartTheme(true);
+} else {
+    document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+}
+
 // --- STARTUP LOADER LOGIC ---
 window.addEventListener('load', () => {
     setTimeout(() => {
