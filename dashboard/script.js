@@ -246,11 +246,27 @@ function updateDashboard(data) {
     treatEl.className = (data.treatment_action !== "system_off") ? 'status-reading highlight' : 'status-reading';
     if (data.treatment_action === "system_off") treatEl.style.color = 'var(--text-secondary)';
 
-    // --- Updates to Actuation Tab Checkboxes ---
-    document.getElementById('chk-pump').checked = (data.treatment_action === "pump_on" || data.treatment_action === "pump_and_pretreat");
-    document.getElementById('chk-uv').checked = (data.treatment_action === "uv_led_on");
-    document.getElementById('chk-elec').checked = (data.treatment_action === "electrolysis_on");
-    document.getElementById('chk-pre').checked = (data.treatment_action === "pump_and_pretreat");
+    // --- Updates to Actuation Tab Checkboxes (only in auto mode) ---
+    const isManualOverride = data.manual_override === true;
+    const overrideBanner = document.getElementById('override-banner');
+    const overrideBannerText = document.getElementById('override-banner-text');
+
+    if (isManualOverride) {
+        overrideBanner.style.display = 'flex';
+        const cmdLabels = { pump_on: 'Standard Pump', uv_led_on: 'UV LED Module', electrolysis_on: 'Electrolysis Electrode', pump_and_pretreat: 'Heavy Pre-treatment' };
+        overrideBannerText.innerText = `Manual Override Active → ${cmdLabels[data.override_command] || data.override_command}`;
+        // Set checkboxes to match the override command
+        document.getElementById('chk-pump').checked = (data.override_command === 'pump_on');
+        document.getElementById('chk-uv').checked = (data.override_command === 'uv_led_on');
+        document.getElementById('chk-elec').checked = (data.override_command === 'electrolysis_on');
+        document.getElementById('chk-pre').checked = (data.override_command === 'pump_and_pretreat');
+    } else {
+        overrideBanner.style.display = 'none';
+        document.getElementById('chk-pump').checked = (data.treatment_action === 'pump_on' || data.treatment_action === 'pump_and_pretreat');
+        document.getElementById('chk-uv').checked = (data.treatment_action === 'uv_led_on');
+        document.getElementById('chk-elec').checked = (data.treatment_action === 'electrolysis_on');
+        document.getElementById('chk-pre').checked = (data.treatment_action === 'pump_and_pretreat');
+    }
 
     // Spike Prediction Update
     const prob = (data.spike_probability * 100).toFixed(1);
@@ -319,9 +335,62 @@ async function fetchData() {
 fetchData();
 setInterval(fetchData, 2000);
 
+// --- MANUAL OVERRIDE TOGGLE LOGIC ---
+const overrideToggles = ['chk-pump', 'chk-uv', 'chk-elec', 'chk-pre'];
+
+overrideToggles.forEach(id => {
+    document.getElementById(id).addEventListener('change', async function () {
+        const command = this.dataset.command;
+
+        if (this.checked) {
+            // Uncheck all other toggles (radio-style: only one active at a time)
+            overrideToggles.forEach(otherId => {
+                if (otherId !== id) document.getElementById(otherId).checked = false;
+            });
+
+            // Send manual override command
+            try {
+                const res = await fetch(`${API_BASE}/manual-override`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: command })
+                });
+                const result = await res.json();
+                console.log('[Override]', result.message);
+            } catch (e) {
+                console.error('Override failed:', e);
+                this.checked = false;
+            }
+        } else {
+            // Unchecking = return to auto mode
+            try {
+                const res = await fetch(`${API_BASE}/manual-override`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: 'auto' })
+                });
+                const result = await res.json();
+                console.log('[Override]', result.message);
+            } catch (e) { console.error('Auto mode failed:', e); }
+        }
+    });
+});
+
+// Return to Auto button
+document.getElementById('btn-auto-mode').addEventListener('click', async () => {
+    try {
+        await fetch(`${API_BASE}/manual-override`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command: 'auto' })
+        });
+        overrideToggles.forEach(id => document.getElementById(id).checked = false);
+        document.getElementById('override-banner').style.display = 'none';
+    } catch (e) { console.error('Auto mode failed:', e); }
+});
+
 // --- STARTUP LOADER LOGIC ---
 window.addEventListener('load', () => {
-    // Give a 1.25 second artificial delay for the classy animation to play before hiding
     setTimeout(() => {
         const loader = document.getElementById('startup-loader');
         if (loader) loader.classList.add('loader-hidden');

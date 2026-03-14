@@ -31,12 +31,12 @@
 
 // ─── WiFi Credentials ───────────────────────────────────────
 // UPDATE THESE before uploading!
-const char* WIFI_SSID     = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID     = "Ryan's iPhone";
+const char* WIFI_PASSWORD = "12345678";
 
 // ─── Server Endpoint ────────────────────────────────────────
 // UPDATE THIS to your laptop/server IP address
-const char* SERVER_URL = "http://192.168.1.100:5000/sensor-data";
+const char* SERVER_URL = "http://172.20.10.4:5000/sensor-data";
 
 // ─── Sensor Pin Definitions ─────────────────────────────────
 // Note: Use ADC1 pins only (GPIO 32-39) since WiFi uses ADC2

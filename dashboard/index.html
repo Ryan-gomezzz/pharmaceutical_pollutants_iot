@@ -352,21 +352,28 @@
                                 <h3>Actuator Control Panel</h3>
                             </div>
                             <div class="card-body">
-                                <p class="subtitle mb-4">The Decision Engine automatically controls these systems
-                                    based
-                                    on AI inference, but manual overrides can be triggered below.</p>
+                                <p class="subtitle mb-4">Toggle any switch to manually override the AI Decision Engine
+                                    for demonstration or sensor failure scenarios.</p>
+
+                                <div id="override-banner" class="override-banner" style="display:none;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span id="override-banner-text">Manual Override Active</span>
+                                    <button id="btn-auto-mode" class="btn btn-small"
+                                        style="margin-left:auto; background:#2ecc71; color:#000; font-size:0.75rem; padding:0.3rem 0.8rem; border-radius:6px; font-weight:600;">Return
+                                        to Auto</button>
+                                </div>
 
                                 <div class="actuator-control-list">
                                     <div class="control-item">
                                         <div class="control-info">
-                                            <i class="fa-solid fa-water"></i>
+                                            <i class="fa-solid fa-water" style="color:#2ecc71"></i>
                                             <div>
                                                 <h4>Standard Pump</h4>
                                                 <p>Routes water securely bypassing treatment.</p>
                                             </div>
                                         </div>
                                         <label class="switch">
-                                            <input type="checkbox" id="chk-pump" disabled>
+                                            <input type="checkbox" id="chk-pump" data-command="pump_on">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -380,7 +387,7 @@
                                             </div>
                                         </div>
                                         <label class="switch">
-                                            <input type="checkbox" id="chk-uv" disabled>
+                                            <input type="checkbox" id="chk-uv" data-command="uv_led_on">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -394,21 +401,21 @@
                                             </div>
                                         </div>
                                         <label class="switch">
-                                            <input type="checkbox" id="chk-elec" disabled>
+                                            <input type="checkbox" id="chk-elec" data-command="electrolysis_on">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
 
                                     <div class="control-item">
                                         <div class="control-info">
-                                            <i class="fa-solid fa-filter text-blue"></i>
+                                            <i class="fa-solid fa-filter" style="color:#e74c3c"></i>
                                             <div>
                                                 <h4>Heavy Pre-treatment</h4>
                                                 <p>Activated upon high Spike Probability.</p>
                                             </div>
                                         </div>
                                         <label class="switch">
-                                            <input type="checkbox" id="chk-pre" disabled>
+                                            <input type="checkbox" id="chk-pre" data-command="pump_and_pretreat">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>

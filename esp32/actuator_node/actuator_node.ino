@@ -27,11 +27,11 @@
 #include <ArduinoJson.h>
 
 // ─── WiFi Credentials ───────────────────────────────────────
-const char* WIFI_SSID     = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID     = "Ryan's iPhone";
+const char* WIFI_PASSWORD = "12345678";
 
 // ─── Server Endpoint ────────────────────────────────────────
-const char* SERVER_URL = "http://192.168.1.100:5000/actuator-command"; // Replace with your laptop IP
+const char* SERVER_URL = "http://172.20.10.4:5000/actuator-command";
 
 // ─── LED GPIO Pin Definitions ───────────────────────────────
 #define LED_GREEN   22   // Normal Water          → pump_on

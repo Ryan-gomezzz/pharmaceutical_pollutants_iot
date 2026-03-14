@@ -77,11 +77,50 @@ def receive_sensor_data():
 
 @app.route('/latest', methods=['GET'])
 def get_latest():
-    return jsonify(latest_state), 200
+    state = dict(latest_state)
+    state['manual_override'] = manual_override['active']
+    state['override_command'] = manual_override['command']
+    return jsonify(state), 200
+
+# ─── Manual Override for Demo/Sensor Failure ─────────────────
+manual_override = {
+    "active": False,
+    "command": "system_off"
+}
+
+@app.route('/manual-override', methods=['POST'])
+def set_manual_override():
+    global manual_override
+    data = request.json
+    if not data or "command" not in data:
+        return jsonify({"error": "Missing 'command'"}), 400
+    
+    cmd = data["command"]
+    valid_commands = ["pump_on", "uv_led_on", "electrolysis_on", "pump_and_pretreat", "system_off", "auto"]
+    
+    if cmd not in valid_commands:
+        return jsonify({"error": f"Invalid command. Valid: {valid_commands}"}), 400
+    
+    if cmd == "auto":
+        manual_override["active"] = False
+        manual_override["command"] = "system_off"
+        print(f"[Override] Manual override DISABLED → returning to AI mode")
+        return jsonify({"message": "Manual override disabled, returning to AI mode", "mode": "auto"}), 200
+    else:
+        manual_override["active"] = True
+        manual_override["command"] = cmd
+        print(f"[Override] Manual override ENABLED → command: {cmd}")
+        return jsonify({"message": f"Manual override set to: {cmd}", "mode": "manual", "command": cmd}), 200
+
+@app.route('/manual-override', methods=['GET'])
+def get_manual_override():
+    return jsonify(manual_override), 200
 
 @app.route('/actuator-command', methods=['GET'])
 def actuator_command():
-    return jsonify({"command": latest_state["treatment_action"]}), 200
+    if manual_override["active"]:
+        return jsonify({"command": manual_override["command"], "mode": "manual"}), 200
+    return jsonify({"command": latest_state["treatment_action"], "mode": "auto"}), 200
 
 @app.route('/feedback', methods=['POST'])
 def receive_feedback():
