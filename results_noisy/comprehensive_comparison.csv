@@ -1,0 +1,9 @@
+Model,Condition,Accuracy,F1_Score,Accuracy_Drop_%
+Isolation Forest,Controlled,0.9395,0.9295282469423412,0.0
+K-Means,Controlled,0.7845,0.7261538555437556,0.0
+Neural Network,Controlled,0.952,0.9501088727779456,0.0
+Random Forest,Controlled,0.955,0.9539327213498976,0.0
+Isolation Forest,Uncontrolled,0.8935,0.8698839340256567,4.896221394358706
+K-Means,Uncontrolled,0.752,0.6939435467827855,4.142766093052897
+Neural Network,Uncontrolled,0.8985,0.8971721679774635,5.619747899159663
+Random Forest,Uncontrolled,0.8965,0.8960326916694324,6.12565445026178
