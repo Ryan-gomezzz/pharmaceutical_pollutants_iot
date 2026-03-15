@@ -17,7 +17,7 @@ def load_models():
     else:
         print(f"Warning: ML model not found at {rf_path}. Run training scripts first.")
 
-def predict(ph, tds, turbidity, temperature):
+def predict(ph, tds, turbidity, temperature, baseline=None):
     if rf_model is None:
         load_models()
         if rf_model is None:
@@ -28,7 +28,25 @@ def predict(ph, tds, turbidity, temperature):
     class_pred = rf_model.predict(features)[0]
     classes = {0: "Normal Water", 1: "Packaging Residue", 2: "Antibiotic Contamination", 3: "Anomaly"}
     
-    return {"anomaly": class_pred == 3, "label": int(class_pred), "status": classes.get(int(class_pred), "Unknown")}
+    result = {"anomaly": class_pred == 3, "label": int(class_pred), "status": classes.get(int(class_pred), "Unknown")}
+    
+    # ─── Upgrade 5: Cluster-Based Deviation Analysis ───────
+    if baseline and baseline["ph"] is not None:
+        deltas = np.array([
+            ph - baseline["ph"],
+            tds - baseline["tds"],
+            turbidity - baseline["turbidity"],
+            temperature - baseline["temperature"]
+        ])
+        
+        # Simple clustering-like heuristic for pharmaceutical indicators
+        # Large TDS shift + pH drop + low turbidity change is often pharmaceutical
+        if abs(deltas[1]) > 150 and deltas[0] < -0.5 and abs(deltas[2]) < 10:
+            result["status"] = "Possible Pharma Contamination (Vector Match)"
+            result["anomaly"] = True
+            print(f"[ML] Deviation Vector {deltas} matches pharmaceutical profile.")
+            
+    return result
 
 def retrain_classifier():
     global rf_model

@@ -7,11 +7,14 @@ from decision_engine import get_action
 import time
 import math
 import os
+import numpy as np
+from hub_network import HubNetworkSimulation
 
 app = Flask(__name__)
 CORS(app)
 
 sensor_buffer = DataBuffer(size=10)
+hub_sim = HubNetworkSimulation(num_hubs=25) # Initialize 25 simulated hubs
 
 # ─── Node Connection Tracking ────────────────────────────────
 node_registry = {
@@ -28,7 +31,19 @@ latest_state = {
     "anomaly": False,
     "spike_probability": 0.0,
     "treatment_action": "system_off",
-    "timestamp": 0
+    "timestamp": 0,
+    "calibration_progress": -1,
+    "baseline": {"ph": None, "tds": None, "turbidity": None, "temperature": None}
+}
+
+# ─── Calibration & Smoothing State ───────────────────────────
+calibration_active = False
+calibration_buffer = [] # Store 20 readings for baseline
+baseline_values = {
+    "ph": None,
+    "tds": None,
+    "turbidity": None,
+    "temperature": None
 }
 
 # ─── EMA Smoothing Filter ─────────────────────────────────────
@@ -47,7 +62,7 @@ def apply_ema(key, new_val):
 
 @app.route('/sensor-data', methods=['POST'])
 def receive_sensor_data():
-    global latest_state
+    global latest_state, calibration_active, calibration_buffer, baseline_values
     
     data = request.json
     if not data or "node" not in data or data["node"] != "sensor_node":
@@ -63,43 +78,83 @@ def receive_sensor_data():
     node_registry["sensor_node"]["readings"] += 1
     print(f"[Node] Sensor node connected from {request.remote_addr} (reading #{node_registry['sensor_node']['readings']})")
 
-    # ─── Apply EMA smoothing to raw sensor readings ──────────
-    ph_s    = apply_ema("ph",           float(data["ph"]))
-    tds_s   = apply_ema("tds",          float(data["tds"]))
-    turb_s  = apply_ema("turbidity",    float(data["turbidity"]))
-    temp_s  = apply_ema("temperature",  float(data["temperature"]))
+    # 1. Raw values
+    raw_ph   = float(data["ph"])
+    raw_tds  = float(data["tds"])
+    raw_turb = float(data["turbidity"])
+    raw_temp = float(data["temperature"])
 
-    # 1. Run Machine Learning models (Anomaly + Classification)
-    ml_result = ml_model.predict(ph_s, tds_s, turb_s, temp_s)
+    # 2. Apply EMA smoothing
+    s_ph    = apply_ema("ph",           raw_ph)
+    s_tds   = apply_ema("tds",          raw_tds)
+    s_turb  = apply_ema("turbidity",    raw_turb)
+    s_temp  = apply_ema("temperature",  raw_temp)
+
+    # ─── Baseline Calibration Logic ──────────────────────────
+    if calibration_active:
+        calibration_buffer.append([raw_ph, raw_tds, raw_turb, raw_temp])
+        print(f"[Calibration] Step {len(calibration_buffer)}/20...")
+        
+        if len(calibration_buffer) >= 20:
+            avgs = np.mean(calibration_buffer, axis=0)
+            baseline_values = {
+                "ph": round(float(avgs[0]), 4),
+                "tds": round(float(avgs[1]), 4),
+                "turbidity": round(float(avgs[2]), 4),
+                "temperature": round(float(avgs[3]), 4)
+            }
+            calibration_active = False
+            calibration_buffer = []
+            print(f"[Calibration] COMPLETED. Baseline: {baseline_values}")
+
+    # ─── Deviation Detection ─────────────────────────────────
+    deltas = {"ph": 0.0, "tds": 0.0, "turbidity": 0.0, "temperature": 0.0}
+    contamination_alert = False
     
-    # 2. Update buffer and run Deep Learning model
-    reading = [ph_s, tds_s, turb_s, temp_s]
-    sensor_buffer.append(reading)
+    if baseline_values["ph"] is not None:
+        deltas["ph"] = round(s_ph - baseline_values["ph"], 4)
+        deltas["tds"] = round(s_tds - baseline_values["tds"], 4)
+        deltas["turbidity"] = round(s_turb - baseline_values["turbidity"], 4)
+        deltas["temperature"] = round(s_temp - baseline_values["temperature"], 4)
+        
+        # Threshold logic for contamination spike
+        # Contamination if: Significant shift in Turbidity OR TDS + pH deviation
+        # Turbidity has a much higher error control range due to natural ambient light interference
+        if (abs(deltas["turbidity"]) > 100.0) or \
+           (abs(deltas["tds"]) > 250.0) or \
+           (abs(deltas["ph"]) > 1.5):
+            contamination_alert = True
+            print(f"[ALERT] Contamination spike detected! D_Turb: {deltas['turbidity']}, D_TDS: {deltas['tds']}, D_pH: {deltas['ph']}")
+
+    # 3. ML Inference (Upgrade 5: use deviations if baseline exists)
+    ml_result = ml_model.predict(s_ph, s_tds, s_turb, s_temp, baseline=baseline_values)
     
+    # 4. Update buffer and Deep Learning
+    sensor_buffer.append([s_ph, s_tds, s_turb, s_temp])
     spike_prob = 0.0
     if sensor_buffer.is_full():
         spike_prob = dl_model.predict_spike(sensor_buffer.get_buffer())
         
-    # 3. Decision Engine determines the action
     action = get_action(ml_result, spike_prob)
     
-    # Filter NaNs for strict JSON compliance (use smoothed values)
-    s_ph = ph_s
-    s_tds = tds_s
-    s_turb = turb_s
-    s_temp = temp_s
-    s_prob = float(round(spike_prob, 4))
-    
+    # Logging for Demo Mode (Upgrade 7)
+    print(f"[Sync] Raw:[{raw_ph}, {raw_tds}] | Filtered:[{s_ph}, {s_tds}] | Delta:[{deltas['ph']}, {deltas['tds']}] | Alert: {contamination_alert}")
+
     latest_state.update({
-        "ph": 0.0 if math.isnan(s_ph) else s_ph,
-        "tds": 0.0 if math.isnan(s_tds) else s_tds,
-        "turbidity": 0.0 if math.isnan(s_turb) else s_turb,
-        "temperature": 0.0 if math.isnan(s_temp) else s_temp,
+        "ph": s_ph,
+        "tds": s_tds,
+        "turbidity": s_turb,
+        "temperature": s_temp,
+        "raw_values": {"ph": raw_ph, "tds": raw_tds, "turbidity": raw_turb, "temperature": raw_temp},
+        "baseline": baseline_values,
+        "deltas": deltas,
+        "contamination_alert": contamination_alert,
         "classification": str(ml_result["status"]),
         "anomaly": bool(ml_result["anomaly"]),
-        "spike_probability": 0.0 if math.isnan(s_prob) else s_prob,
+        "spike_probability": float(round(spike_prob, 4)),
         "treatment_action": str(action),
-        "timestamp": float(time.time())
+        "timestamp": float(time.time()),
+        "calibration_progress": len(calibration_buffer) if calibration_active else -1
     })
 
     return jsonify({"message": "Data processed"}), 200
@@ -144,6 +199,15 @@ def set_manual_override():
 @app.route('/manual-override', methods=['GET'])
 def get_manual_override():
     return jsonify(manual_override), 200
+
+@app.route('/set-baseline', methods=['POST'])
+def trigger_baseline():
+    global calibration_active, calibration_buffer, latest_state
+    calibration_active = True
+    calibration_buffer = []
+    latest_state["calibration_progress"] = 0
+    print("[Calibration] Triggered baseline collection (next 20 readings)")
+    return jsonify({"message": "Calibration mode activated. Send 20 readings."}), 200
 
 @app.route('/node-status', methods=['GET'])
 def get_node_status():
@@ -204,6 +268,16 @@ def retrain_models():
         return jsonify({"message": "Models successfully retrained and hot-reloaded"}), 200
     else:
         return jsonify({"error": "Retraining failed"}), 500
+
+@app.route('/gov-status', methods=['GET'])
+def gov_status():
+    status = hub_sim.get_gov_status(latest_state)
+    return jsonify(status), 200
+
+@app.route('/simulate-event', methods=['POST'])
+def simulate_event():
+    result = hub_sim.trigger_simulation()
+    return jsonify(result), 200
 
 if __name__ == '__main__':
     ml_model.load_models()

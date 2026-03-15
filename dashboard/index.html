@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 
@@ -35,6 +38,8 @@
                     Nodes</a>
                 <a href="#" class="nav-item" data-target="view-actuation"><i
                         class="fa-solid fa-bolt-lightning text-slate"></i> Actuation</a>
+                <a href="#" class="nav-item" data-target="view-gov"><i
+                        class="fa-solid fa-building-columns text-green"></i> Gov Coordination</a>
                 <a href="#" class="nav-item" data-target="view-ai-models"><i class="fa-solid fa-brain"></i> AI
                     Models</a>
                 <a href="#" class="nav-item" data-target="view-settings"><i class="fa-solid fa-sliders"></i>
@@ -57,8 +62,9 @@
                     <div class="timestamp" id="last-updated">Updating...</div>
                     <button class="btn btn-primary" id="btn-export"><i class="fa-solid fa-download"></i> Export
                         Report</button>
-                    <button class="btn" id="btn-theme-toggle"
-                        style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.6rem; aspect-ratio: 1/1; justify-content: center;">
+                    <!-- Theme Toggle (Upgrade 6) -->
+                    <button id="btn-theme-toggle" class="btn"
+                        style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.6rem; aspect-ratio: 1/1; justify-content: center; display: flex; align-items: center;">
                         <i id="theme-icon" class="fa-solid fa-sun"></i>
                     </button>
                     <div class="profile-avatar">
@@ -86,6 +92,17 @@
                                 <p
                                     style="color: var(--text-secondary); text-shadow: 0 1px 2px rgba(0,0,0,0.8); font-weight: 500;">
                                     Real-time inference and hardware orchestration active.</p>
+                            </div>
+                        </div>
+
+                        <!-- Contamination Alert Banner (Upgrade 4) -->
+                        <div id="contamination-alert" class="glass-card full-width alert-banner"
+                            style="display: none; margin-bottom: 2rem; background: rgba(220, 38, 38, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); align-items: center; gap: 1rem; padding: 1rem 1.5rem;">
+                            <i class="fa-solid fa-triangle-exclamation fa-2x blink"></i>
+                            <div>
+                                <h3 style="margin: 0; color: var(--accent-red);">CONTAMINATION DETECTED</h3>
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--text-primary);">Significant
+                                    deviation from baseline parameters observed. Check logs for details.</p>
                             </div>
                         </div>
 
@@ -139,27 +156,91 @@
                             </div>
                         </section>
 
-                        <!-- Continuous Learning Feedback Row -->
+                        <!-- Continuous Learning & Baseline Calibration Row -->
                         <section class="feedback-row">
-                            <div class="glass-card full-width feedback-card">
-                                <div>
+                            <div class="glass-card full-width feedback-card"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <!-- AI Feedback -->
+                                <div style="border-right: 1px solid var(--border-color); padding-right: 2rem;">
                                     <h3 style="margin-bottom:0.2rem;"><i
                                             class="fa-solid fa-graduation-cap text-indigo"></i> Continuous Learning</h3>
-                                    <p class="subtitle" style="margin:0;">Validate the current AI prediction or correct
+                                    <p class="subtitle" style="margin-bottom: 1rem;">Validate the current AI prediction
+                                        or correct
                                         it to expand the dataset.</p>
+                                    <div class="feedback-controls">
+                                        <select id="sel-feedback" class="input-element">
+                                            <option value="0">Normal Water</option>
+                                            <option value="1">Packaging Residue</option>
+                                            <option value="2">Antibiotic Contamination</option>
+                                            <option value="3">Anomaly</option>
+                                        </select>
+                                        <button id="btn-submit-feedback" class="btn btn-primary"><i
+                                                class="fa-solid fa-check-double"></i> Submit Hit</button>
+                                        <button id="btn-trigger-retrain" class="btn btn-primary"
+                                            style="background:#4f46e5;"><i class="fa-solid fa-arrows-rotate"></i>
+                                            Retrain
+                                            Models</button>
+                                    </div>
                                 </div>
-                                <div class="feedback-controls">
-                                    <select id="sel-feedback" class="input-element">
-                                        <option value="0">Normal Water</option>
-                                        <option value="1">Packaging Residue</option>
-                                        <option value="2">Antibiotic Contamination</option>
-                                        <option value="3">Anomaly</option>
-                                    </select>
-                                    <button id="btn-submit-feedback" class="btn btn-primary"><i
-                                            class="fa-solid fa-check-double"></i> Submit Hit</button>
-                                    <button id="btn-trigger-retrain" class="btn btn-primary"
-                                        style="background:#4f46e5;"><i class="fa-solid fa-arrows-rotate"></i> Retrain
-                                        Models</button>
+                                <!-- Baseline Calibration (Upgrade 1) -->
+                                <div>
+                                    <h3 style="margin-bottom:0.2rem;"><i
+                                            class="fa-solid fa-scale-balanced text-blue"></i> Baseline Calibration</h3>
+                                    <p class="subtitle" style="margin-bottom: 1rem;">Establish a clean water reference
+                                        for anomaly detection.</p>
+                                    <div class="baseline-controls"
+                                        style="display: flex; align-items: center; gap: 1rem;">
+                                        <button id="btn-set-baseline" class="btn btn-primary"
+                                            style="background: var(--accent-blue);">
+                                            <i class="fa-solid fa-crosshairs"></i> Set Baseline
+                                        </button>
+                                        <div id="calibration-status"
+                                            style="font-size: 0.85rem; color: var(--text-secondary);">
+                                            Status: <span id="baseline-status-text" class="text-green">Ready</span>
+                                        </div>
+                                    </div>
+                                    <div id="calibration-progress-container" style="display: none; margin-top: 1rem;">
+                                        <div class="progress-bar-bg"
+                                            style="width: 100%; height: 6px; background: var(--bg-surface-hover); border-radius: 3px; overflow: hidden;">
+                                            <div id="calibration-progress-bar"
+                                                style="width: 0%; height: 100%; background: var(--accent-blue); transition: width 0.3s ease;">
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.75rem; margin-top: 0.3rem;" id="calibration-step-text">
+                                            Collecting sample 0/20...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Baseline Values Display (Upgrade 6) -->
+                        <section class="baseline-values-row"
+                            style="margin-bottom: 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                            <div class="glass-card sensor-card mini" style="padding: 1rem;">
+                                <div
+                                    style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">
+                                    Base pH</div>
+                                <div id="base-ph" class="font-mono" style="font-size: 1.1rem; font-weight: 600;">-</div>
+                            </div>
+                            <div class="glass-card sensor-card mini" style="padding: 1rem;">
+                                <div
+                                    style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">
+                                    Base TDS</div>
+                                <div id="base-tds" class="font-mono" style="font-size: 1.1rem; font-weight: 600;">-
+                                </div>
+                            </div>
+                            <div class="glass-card sensor-card mini" style="padding: 1rem;">
+                                <div
+                                    style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">
+                                    Base Turb</div>
+                                <div id="base-turb" class="font-mono" style="font-size: 1.1rem; font-weight: 600;">-
+                                </div>
+                            </div>
+                            <div class="glass-card sensor-card mini" style="padding: 1rem;">
+                                <div
+                                    style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">
+                                    Base Temp</div>
+                                <div id="base-temp" class="font-mono" style="font-size: 1.1rem; font-weight: 600;">-
                                 </div>
                             </div>
                         </section>
@@ -450,7 +531,134 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <!-- END ACTUATION VIEW -->
+
+                <!-- GOV COORDINATION VIEW -->
+                <div id="view-gov" class="view-section">
+
+                    <!-- Top Status Banner -->
+                    <div class="glass-card full-width"
+                        style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-shield-halved text-green"></i>
+                                Environmental Governance</h2>
+                            <p class="subtitle" style="margin: 0;">National Water Quality Monitoring Protocol Framework
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div
+                                style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                                Current Severity</div>
+                            <div id="gov-severity-badge" class="badge badge-green"
+                                style="font-size: 1.1rem; padding: 0.5rem 1rem;">
+                                NORMAL</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2-col" style="grid-template-columns: 1.5fr 1fr;">
+
+                        <!-- Left Column: Map & Simulation Controls -->
+                        <div style="display: flex; flex-direction: column; gap: 2rem;">
+                            <!-- Active Authorities -->
+                            <div class="glass-card"
+                                style="display: flex; gap: 1rem; justify-content: space-around; padding: 1rem;">
+                                <div style="text-align: center;">
+                                    <i class="fa-solid fa-building text-blue fa-2x"></i>
+                                    <div style="font-weight: 600; margin-top: 0.5rem;">MoEFCC</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <i class="fa-solid fa-building-flag text-indigo fa-2x"></i>
+                                    <div style="font-weight: 600; margin-top: 0.5rem;">CPCB</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <i class="fa-solid fa-map-location-dot text-orange fa-2x"></i>
+                                    <div style="font-weight: 600; margin-top: 0.5rem;">SPCB</div>
+                                </div>
+                            </div>
+
+                            <!-- Map Visualization -->
+                            <div class="glass-card"
+                                style="padding: 0; overflow: hidden; height: 400px; display: flex; flex-direction: column;">
+                                <div class="card-header"
+                                    style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                                    <i class="fa-solid fa-satellite-dish text-blue"></i>
+                                    <h3 style="margin:0;">Regional Monitoring Network</h3>
+                                </div>
+                                <div id="hub-map" style="flex-grow: 1; width: 100%; z-index: 1;"></div>
+                            </div>
+
+                            <!-- Simulation Trigger -->
+                            <div class="glass-card">
+                                <h3><i class="fa-solid fa-vial-circle-check text-orange"></i> Simulation Engine</h3>
+                                <p class="subtitle" style="margin-bottom: 1rem;">Force a multi-hub pharmaceutical
+                                    contamination event to demonstrate the triangulation and response workflow.</p>
+                                <button id="btn-simulate-gov" class="btn btn-primary"
+                                    style="background: var(--accent-orange); width: 100%;">
+                                    <i class="fa-solid fa-biohazard"></i> Simulate Contamination Event
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Coordinates & Workflow -->
+                        <div style="display: flex; flex-direction: column; gap: 2rem;">
+
+                            <!-- Triangulation Results -->
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <i class="fa-solid fa-location-crosshairs text-red"></i>
+                                    <h3 style="margin:0;">Source Triangulation</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="gov-source-panel" style="display: none;">
+                                        <div
+                                            style="background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                            <h4 style="color: var(--accent-red); margin-top: 0; margin-bottom: 0.5rem;">
+                                                Estimated Pollutant Origin</h4>
+                                            <div class="font-mono" style="font-size: 1.1rem; margin-bottom: 0.5rem;"
+                                                id="gov-source-coords">12.9716, 77.5946</div>
+                                            <div
+                                                style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                                                <span>Confidence: <strong id="gov-source-conf"
+                                                        class="text-orange">85%</strong></span>
+                                                <span>Radius: <strong id="gov-source-rad">1.5 km</strong></span>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.9rem;">
+                                            <p style="margin-bottom: 0.5rem;"><strong>Pollutant Signature:</strong>
+                                                <span id="gov-pollutant-type" class="text-indigo">Unknown</span>
+                                            </p>
+                                            <p style="margin-bottom: 0;"><strong>Active Hubs in Cluster:</strong> <span
+                                                    id="gov-active-hubs" class="font-mono">0</span></p>
+                                        </div>
+                                    </div>
+                                    <div id="gov-source-idle"
+                                        style="text-align: center; padding: 2rem 0; color: var(--text-secondary);">
+                                        <i class="fa-solid fa-map-location fa-3x"
+                                            style="opacity: 0.3; margin-bottom: 1rem;"></i>
+                                        <p>No active contamination clusters detected in the network.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Response Workflow -->
+                            <div class="glass-card" style="flex-grow: 1;">
+                                <div class="card-header">
+                                    <i class="fa-solid fa-clipboard-list text-blue"></i>
+                                    <h3 style="margin:0;">Response Logistics Protocol</h3>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="rules-list" id="gov-workflow-list">
+                                        <li><i class="fa-solid fa-check text-green"></i> <strong>System
+                                                Nominal:</strong> No immediate action required.</li>
+                                        <li><i class="fa-solid fa-check text-green"></i> <strong>Automated
+                                                Monitoring:</strong> Active across 25 regional nodes.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div> <!-- END GOV COORDINATION VIEW -->
 
                 <!-- AI MODELS VIEW -->
                 <div id="view-ai-models" class="view-section">
@@ -497,7 +705,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <!-- END AI MODELS VIEW -->
 
                 <!-- SETTINGS VIEW -->
                 <div id="view-settings" class="view-section">
@@ -529,12 +737,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <!-- END SETTINGS VIEW -->
 
-            </div>
+            </div> <!-- END VIEW-CONTAINER -->
         </main>
-    </div>
+    </div> <!-- END APP-CONTAINER -->
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Export Script via JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js?v=2.0"></script>

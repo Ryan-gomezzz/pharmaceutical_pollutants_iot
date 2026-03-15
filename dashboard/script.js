@@ -3,34 +3,80 @@ const API_BASE = 'http://127.0.0.1:5000';
 
 let globalDataLog = []; // Stores history for CSV export
 
+// Initialize Leaflet Map
+let govMap = null;
+let mapMarkers = [];
+let sourceMarker = null;
+let sourceCircle = null;
+
+function initGovMap() {
+    if (govMap) return; // already initialized
+
+    // Default center (Bengaluru)
+    govMap = L.map('hub-map').setView([12.9716, 77.5946], 12);
+
+    // Add dark theme tile layer (CartoDB Dark Matter)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(govMap);
+
+    // Force a resize calculation shortly after rendering
+    setTimeout(() => {
+        govMap.invalidateSize();
+    }, 500);
+}
+
+// Navigation Tab Switching
+function switchView(targetId) {
+    document.querySelectorAll('.view-section').forEach(view => {
+        view.classList.remove('active');
+    });
+    const target = document.getElementById(targetId);
+    if (target) {
+        target.classList.add('active');
+        if (targetId === 'view-gov') {
+            initGovMap();
+        }
+    }
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-target') === targetId) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Update active icon color
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.classList.remove('text-blue');
+            if (btn.classList.contains('active')) icon.classList.add('text-blue');
+        }
+    });
+
+    // Update header dynamically
+    const titleMap = {
+        'view-dashboard': { title: 'Real-time Analytics', sub: 'Live telemetry from Jellyfish Sensor Node 01' },
+        'view-nodes': { title: 'Hardware Nodes', sub: 'Fleet management and network topology' },
+        'view-actuation': { title: 'Actuation & Treatments', sub: 'Decision engine outputs and overrides' },
+        'view-ai-models': { title: 'AI & Inference Models', sub: 'Cloud-trained statistical matrices running locally' },
+        'view-settings': { title: 'System Configuration', sub: 'Environment variables and thresholds' },
+        'view-gov': { title: 'Gov Coordination', sub: 'Regional contamination monitoring and response' }
+    };
+
+    document.getElementById('page-title').innerText = titleMap[targetId].title;
+    document.getElementById('page-subtitle').innerText = titleMap[targetId].sub;
+}
+
 // --- SPA NAVIGATION LOGIC ---
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function (e) {
         e.preventDefault();
-
-        // Remove active class from all navs
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        // Add to clicked
-        this.classList.add('active');
-
-        // Hide all views
-        document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
-
-        // Show target view
         const targetId = this.getAttribute('data-target');
-        document.getElementById(targetId).classList.add('active');
-
-        // Update header dynamically
-        const titleMap = {
-            'view-dashboard': { title: 'Real-time Analytics', sub: 'Live telemetry from Jellyfish Sensor Node 01' },
-            'view-nodes': { title: 'Hardware Nodes', sub: 'Fleet management and network topology' },
-            'view-actuation': { title: 'Actuation & Treatments', sub: 'Decision engine outputs and overrides' },
-            'view-ai-models': { title: 'AI & Inference Models', sub: 'Cloud-trained statistical matrices running locally' },
-            'view-settings': { title: 'System Configuration', sub: 'Environment variables and thresholds' }
-        };
-
-        document.getElementById('page-title').innerText = titleMap[targetId].title;
-        document.getElementById('page-subtitle').innerText = titleMap[targetId].sub;
+        switchView(targetId);
     });
 });
 
@@ -91,16 +137,18 @@ document.getElementById('btn-submit-feedback').addEventListener('click', async (
     } catch (e) { console.error(e); }
 });
 
-document.getElementById('btn-trigger-retrain').addEventListener('click', async () => {
-    const btn = document.getElementById('btn-trigger-retrain');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Retraining...';
-    try {
-        const res = await fetch(`${API_BASE}/retrain`, { method: 'POST' });
-        if (res.ok) alert("Neural Nets and ML Classifiers successfully hot-swapped!");
-        else alert("Failed to retrain models.");
-    } catch (e) { console.error(e); }
-    btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Retrain Models';
-});
+const retrainBtn = document.getElementById('btn-trigger-retrain');
+if (retrainBtn) {
+    retrainBtn.addEventListener('click', async () => {
+        retrainBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Retraining...';
+        try {
+            const res = await fetch(`${API_BASE}/retrain`, { method: 'POST' });
+            if (res.ok) alert("Neural Nets and ML Classifiers successfully hot-swapped!");
+            else alert("Failed to retrain models.");
+        } catch (e) { console.error(e); }
+        retrainBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Retrain Models';
+    });
+}
 
 // --- CHART THEME ---
 Chart.defaults.color = '#a1a1aa';
@@ -200,6 +248,26 @@ const classPieChart = new Chart(pieCtx, {
     }
 });
 
+// --- BASELINE DATASETS ---
+// We add baseline datasets to the existing charts to show the reference levels.
+function addBaselineDataset(chart, label, color) {
+    chart.data.datasets.push({
+        label: `${label} Baseline`,
+        data: [],
+        borderColor: color,
+        borderDash: [5, 5],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false,
+        order: 1
+    });
+}
+
+addBaselineDataset(turbidityChart, 'Turbidity', 'rgba(37, 99, 235, 0.6)');
+addBaselineDataset(tdsChart, 'TDS', 'rgba(5, 150, 105, 0.6)');
+addBaselineDataset(phChart, 'pH', 'rgba(79, 70, 229, 0.6)');
+addBaselineDataset(tempChart, 'Temp', 'rgba(220, 38, 38, 0.6)');
+
 const maxDataPoints = 30;
 
 // --- DATA POLLING LOGIC ---
@@ -277,26 +345,57 @@ function updateDashboard(data) {
     probEl.innerText = `${prob}%`;
     probEl.className = 'status-reading ' + (prob > 50 ? 'danger' : 'normal');
 
+    // Contamination Alert Update (Upgrade 4)
+    const alertEl = document.getElementById('contamination-alert');
+    if (data.contamination_alert) {
+        alertEl.style.display = 'flex';
+    } else {
+        alertEl.style.display = 'none';
+    }
+
+    // Baseline & Progress Update (Upgrade 1)
+    if (data.calibration_progress !== -1) {
+        document.getElementById('calibration-status').style.display = 'none';
+        document.getElementById('calibration-progress-container').style.display = 'block';
+        const progress = (data.calibration_progress / 20) * 100;
+        document.getElementById('calibration-progress-bar').style.width = `${progress}%`;
+        document.getElementById('calibration-step-text').innerText = `Collecting sample ${data.calibration_progress}/20...`;
+    } else {
+        document.getElementById('calibration-status').style.display = 'block';
+        document.getElementById('calibration-progress-container').style.display = 'none';
+    }
+
+    if (data.baseline && data.baseline.ph !== null) {
+        document.getElementById('base-ph').innerText = data.baseline.ph.toFixed(2);
+        document.getElementById('base-tds').innerText = data.baseline.tds.toFixed(1);
+        document.getElementById('base-turb').innerText = data.baseline.turbidity.toFixed(1);
+        document.getElementById('base-temp').innerText = data.baseline.temperature.toFixed(1);
+        document.getElementById('baseline-status-text').innerText = "Calibrated";
+        document.getElementById('baseline-status-text').className = "text-indigo";
+    }
+
     // Chart Appends
-    turbidityChart.data.labels.push(nowStr);
-    turbidityChart.data.datasets[0].data.push(data.turbidity);
-    if (turbidityChart.data.labels.length > maxDataPoints) { turbidityChart.data.labels.shift(); turbidityChart.data.datasets[0].data.shift(); }
-    turbidityChart.update();
+    const updateChartData = (chart, value, baseline) => {
+        chart.data.labels.push(nowStr);
+        chart.data.datasets[0].data.push(value);
+        if (baseline !== null && baseline !== undefined) {
+            chart.data.datasets[1].data.push(baseline);
+        } else {
+            chart.data.datasets[1].data.push(null);
+        }
 
-    tdsChart.data.labels.push(nowStr);
-    tdsChart.data.datasets[0].data.push(data.tds);
-    if (tdsChart.data.labels.length > maxDataPoints) { tdsChart.data.labels.shift(); tdsChart.data.datasets[0].data.shift(); }
-    tdsChart.update();
+        if (chart.data.labels.length > maxDataPoints) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[1].data.shift();
+        }
+        chart.update();
+    };
 
-    phChart.data.labels.push(nowStr);
-    phChart.data.datasets[0].data.push(data.ph);
-    if (phChart.data.labels.length > maxDataPoints) { phChart.data.labels.shift(); phChart.data.datasets[0].data.shift(); }
-    phChart.update();
-
-    tempChart.data.labels.push(nowStr);
-    tempChart.data.datasets[0].data.push(data.temperature);
-    if (tempChart.data.labels.length > maxDataPoints) { tempChart.data.labels.shift(); tempChart.data.datasets[0].data.shift(); }
-    tempChart.update();
+    updateChartData(turbidityChart, data.turbidity, data.baseline ? data.baseline.turbidity : null);
+    updateChartData(tdsChart, data.tds, data.baseline ? data.baseline.tds : null);
+    updateChartData(phChart, data.ph, data.baseline ? data.baseline.ph : null);
+    updateChartData(tempChart, data.temperature, data.baseline ? data.baseline.temperature : null);
 
     spikeChart.data.labels.push(nowStr);
     spikeChart.data.datasets[0].data.push(prob);
@@ -334,32 +433,43 @@ async function fetchData() {
     }
 }
 
+function updateConnectionUI(nodeType, isOnline, data) {
+    const statusEl = document.getElementById(`status-${nodeType}-node`);
+    const ipEl = document.getElementById(`ip-${nodeType}-node`);
+    const readsEl = document.getElementById(`reads-${nodeType}-node`);
+
+    if (statusEl) {
+        statusEl.innerHTML = isOnline
+            ? '<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Active</span>'
+            : '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+    }
+    if (ipEl) ipEl.innerText = isOnline ? data.ip : '-';
+    if (readsEl) readsEl.innerText = isOnline ? data.readings + ' reqs' : '-';
+}
+
 async function fetchNodeStatus() {
     try {
         const response = await fetch(`${API_BASE}/node-status`);
         if (response.ok) {
-            const data = await response.json();
+            const statusData = await response.json();
+            updateConnectionUI('sensor', statusData.sensor_node.online, statusData.sensor_node);
+            updateConnectionUI('actuator', statusData.actuator_node.online, statusData.actuator_node);
 
-            // Sensor Node Update
-            const sNode = data.sensor_node;
-            document.getElementById('status-sensor-node').innerHTML = sNode.online
-                ? '<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Active</span>'
-                : '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
-            document.getElementById('ip-sensor-node').innerText = sNode.online ? sNode.ip : '-';
-            document.getElementById('reads-sensor-node').innerText = sNode.readings + ' reqs';
+            // Poll Gov Status
+            const govRes = await fetch(`${API_BASE}/gov-status`);
+            const govData = await govRes.json();
+            updateGovCoordination(govData);
 
-            // Actuator Node Update
-            const aNode = data.actuator_node;
-            document.getElementById('status-actuator-node').innerHTML = aNode.online
-                ? '<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Active</span>'
-                : '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
-            document.getElementById('ip-actuator-node').innerText = aNode.online ? aNode.ip : '-';
-            document.getElementById('reads-actuator-node').innerText = aNode.readings + ' reqs';
+        } else {
+            // API error, mark all nodes offline
+            updateConnectionUI('sensor', false, {});
+            updateConnectionUI('actuator', false, {});
         }
     } catch (e) {
         // Backend down, marking nodes offline
-        document.getElementById('status-sensor-node').innerHTML = '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
-        document.getElementById('status-actuator-node').innerHTML = '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark"></i> Offline</span>';
+        updateConnectionUI('sensor', false, {});
+        updateConnectionUI('actuator', false, {});
+        console.error('Fetch error:', e);
     }
 }
 
@@ -413,17 +523,165 @@ overrideToggles.forEach(id => {
 });
 
 // Return to Auto button
-document.getElementById('btn-auto-mode').addEventListener('click', async () => {
-    try {
-        await fetch(`${API_BASE}/manual-override`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ command: 'auto' })
-        });
-        overrideToggles.forEach(id => document.getElementById(id).checked = false);
-        document.getElementById('override-banner').style.display = 'none';
-    } catch (e) { console.error('Auto mode failed:', e); }
-});
+const autoBtn = document.getElementById('btn-auto-mode');
+if (autoBtn) {
+    autoBtn.addEventListener('click', async () => {
+        try {
+            await fetch(`${API_BASE}/manual-override`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command: 'auto' })
+            });
+            overrideToggles.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = false;
+            });
+            const banner = document.getElementById('override-banner');
+            if (banner) banner.style.display = 'none';
+        } catch (e) { console.error('Auto mode failed:', e); }
+    });
+}
+
+// --- UI UPDATERS ---
+function setDisplay(id, text, colorClass = null) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.innerText = text;
+        if (colorClass) {
+            el.className = 'font-bold ' + colorClass;
+        }
+    }
+}
+
+// Gov Coordination UI Updater
+function updateGovCoordination(data) {
+    if (!govMap) return;
+
+    // Severity Badge
+    const severityBadge = document.getElementById('gov-severity-badge');
+    if (severityBadge) {
+        severityBadge.innerText = data.severity.toUpperCase();
+        severityBadge.className = 'badge';
+        if (data.severity === 'Normal') severityBadge.classList.add('badge-green');
+        else if (data.severity === 'Low') severityBadge.classList.add('badge-yellow');
+        else if (data.severity === 'Moderate') severityBadge.classList.add('badge-orange');
+        else if (data.severity === 'Severe') severityBadge.classList.add('badge-red');
+    }
+
+    // Map Markers
+    mapMarkers.forEach(m => govMap.removeLayer(m));
+    mapMarkers = [];
+
+    data.hubs.forEach(hub => {
+        const isAlert = hub.status === 'alert';
+        const color = isAlert ? 'red' : 'green';
+
+        // Use standard Leaflet marker with custom styling via CSS or simple circle markers
+        const marker = L.circleMarker([hub.lat, hub.lng], {
+            radius: isAlert ? 8 : 5,
+            fillColor: color,
+            color: '#fff',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).bindPopup(`<b>${hub.id}</b><br>Status: ${hub.status}<br>Intensity: ${hub.deviation_intensity}`);
+
+        marker.addTo(govMap);
+        mapMarkers.push(marker);
+    });
+
+    // Source Triangulation
+    const idlePanel = document.getElementById('gov-source-idle');
+    const dataPanel = document.getElementById('gov-source-panel');
+
+    if (sourceMarker) govMap.removeLayer(sourceMarker);
+    if (sourceCircle) govMap.removeLayer(sourceCircle);
+
+    if (data.estimated_source) {
+        if (idlePanel) idlePanel.style.display = 'none';
+        if (dataPanel) dataPanel.style.display = 'block';
+
+        document.getElementById('gov-source-coords').innerText = `${data.estimated_source.lat}, ${data.estimated_source.lng}`;
+        document.getElementById('gov-source-conf').innerText = `${data.estimated_source.confidence}%`;
+        document.getElementById('gov-source-rad').innerText = `${data.estimated_source.radius_km} km`;
+        document.getElementById('gov-pollutant-type').innerText = data.pollutant_category;
+
+        const activeCount = data.hubs.filter(h => h.status === 'alert').length;
+        document.getElementById('gov-active-hubs').innerText = activeCount;
+
+        // Draw source on map
+        sourceMarker = L.marker([data.estimated_source.lat, data.estimated_source.lng]).addTo(govMap);
+        sourceMarker.bindPopup(`<b>Estimated Contamination Source</b><br>Confidence: ${data.estimated_source.confidence}%`);
+
+        sourceCircle = L.circle([data.estimated_source.lat, data.estimated_source.lng], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.1,
+            radius: data.estimated_source.radius_km * 1000 // Convert km to meters
+        }).addTo(govMap);
+
+    } else {
+        if (idlePanel) idlePanel.style.display = 'block';
+        if (dataPanel) dataPanel.style.display = 'none';
+
+        document.getElementById('gov-source-coords').innerText = `--`;
+        document.getElementById('gov-source-conf').innerText = `--`;
+        document.getElementById('gov-pollutant-type').innerText = 'System Nominal';
+        document.getElementById('gov-active-hubs').innerText = '0';
+    }
+
+    // Response Workflow
+    const workflowList = document.getElementById('gov-workflow-list');
+    if (workflowList) {
+        workflowList.innerHTML = '';
+        if (data.recommended_actions.length === 0) {
+            workflowList.innerHTML = `
+                <li><i class="fa-solid fa-check text-green"></i> <strong>System Nominal:</strong> No immediate action required.</li>
+                <li><i class="fa-solid fa-check text-green"></i> <strong>Automated Monitoring:</strong> Active across 25 regional nodes.</li>
+            `;
+        } else {
+            data.recommended_actions.forEach(action => {
+                const li = document.createElement('li');
+                const isTrigger = action.includes("TRIGGER:");
+                li.innerHTML = `<i class="fa-solid fa-${isTrigger ? 'triangle-exclamation text-red' : 'arrow-right text-blue'}"></i> ${action}`;
+                workflowList.appendChild(li);
+            });
+
+            // Add Gov Tab Alert to top header nav if not already there
+            const govNavTab = document.querySelector('a[data-target="view-gov"]');
+            if (govNavTab && !govNavTab.innerHTML.includes('fa-circle-exclamation')) {
+                govNavTab.innerHTML += ' <i class="fa-solid fa-circle-exclamation text-red blink"></i>';
+            }
+        }
+
+        // Remove alert from tab if normal
+        if (data.severity === 'Normal') {
+            const govNavTab = document.querySelector('a[data-target="view-gov"]');
+            if (govNavTab && govNavTab.innerHTML.includes('fa-circle-exclamation')) {
+                govNavTab.innerHTML = '<i class="fa-solid fa-building-columns text-green"></i> Gov Coordination';
+            }
+        }
+    }
+}
+
+// Gov Coordination Simulation Trigger
+const btnSimulateGov = document.getElementById('btn-simulate-gov');
+if (btnSimulateGov) {
+    btnSimulateGov.addEventListener('click', async () => {
+        btnSimulateGov.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Triggering...';
+        btnSimulateGov.disabled = true;
+        try {
+            const res = await fetch(`${API_BASE}/simulate-event`, { method: 'POST' });
+            const data = await res.json();
+            console.log(`Simulation Triggered! Epicenter roughly at: ${data.epicenter_roughly.lat}, ${data.epicenter_roughly.lng}`);
+        } catch (e) { console.error('Simulation trigger failed:', e); }
+
+        setTimeout(() => {
+            btnSimulateGov.innerHTML = '<i class="fa-solid fa-biohazard"></i> Simulate Contamination Event';
+            btnSimulateGov.disabled = false;
+        }, 3000);
+    });
+}
 
 // --- LIGHT / DARK THEME TOGGLE LOGIC ---
 const allCharts = [turbidityChart, tdsChart, phChart, tempChart, spikeChart, classPieChart];
@@ -463,29 +721,45 @@ function applyChartTheme(isLight) {
 function toggleTheme() {
     const html = document.documentElement;
     const isLight = html.getAttribute('data-theme') === 'light';
+    const themeIcon = document.getElementById('theme-icon');
 
     if (isLight) {
         html.removeAttribute('data-theme');
         localStorage.setItem('theme', 'dark');
-        document.getElementById('theme-icon').className = 'fa-solid fa-sun'; // Sun icon for switching TO light
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
         applyChartTheme(false);
     } else {
         html.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
-        document.getElementById('theme-icon').className = 'fa-solid fa-moon'; // Moon icon for switching TO dark
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon';
         applyChartTheme(true);
     }
 }
 
-document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
+const themeBtn = document.getElementById('btn-theme-toggle');
+if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+// --- SET BASELINE TRIGGER ---
+document.getElementById('btn-set-baseline').addEventListener('click', async () => {
+    try {
+        const res = await fetch(`${API_BASE}/set-baseline`, { method: 'POST' });
+        if (res.ok) {
+            console.log("Baseline calibration triggered.");
+            document.getElementById('baseline-status-text').innerText = "Calibrating...";
+            document.getElementById('baseline-status-text').className = "text-orange blink";
+        }
+    } catch (e) { console.error("Failed to trigger baseline:", e); }
+});
 
 // Initialize theme on load
 if (localStorage.getItem('theme') === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-    document.getElementById('theme-icon').className = 'fa-solid fa-moon';
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) themeIcon.className = 'fa-solid fa-moon';
     applyChartTheme(true);
 } else {
-    document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
 }
 
 // --- STARTUP LOADER LOGIC ---
