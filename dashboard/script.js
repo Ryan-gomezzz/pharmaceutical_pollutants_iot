@@ -106,7 +106,7 @@ document.getElementById('btn-export').addEventListener('click', function () {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     const dateStr = new Date().toISOString().replace(/:/g, '-').slice(0, 19);
-    link.setAttribute("download", `PokeLab_Telemetry_Export_${dateStr}.csv`);
+    link.setAttribute("download", `AquaIntel_Telemetry_Export_${dateStr}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

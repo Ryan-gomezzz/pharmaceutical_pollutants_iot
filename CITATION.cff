@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+message: >
+  If you use this software in your research, please cite it using the metadata below.
+title: "AquaIntel: Smart Wastewater Monitoring System — The Jellyfish"
+abstract: >
+  An end-to-end IoT, Machine Learning, and Edge Robotics platform for real-time
+  detection and mitigation of pharmaceutical pollutants in water streams.
+  The system combines a bio-mimetic floating sensor node (ESP32-based "Jellyfish"),
+  a Flask REST API backend with dual ML models (Random Forest + LSTM), an
+  automated treatment actuation layer, and a real-time web dashboard.
+  Developed as part of research into low-cost pharmaceutical pollution monitoring
+  for developing-world water infrastructure.
+version: "1.0.0"
+date-released: "2025-01-01"
+license: MIT
+url: "https://github.com/[username]/aquaintel"
+repository-code: "https://github.com/[username]/aquaintel"
+keywords:
+  - IoT
+  - water quality monitoring
+  - pharmaceutical pollution
+  - machine learning
+  - LSTM
+  - random forest
+  - ESP32
+  - edge computing
+  - environmental monitoring
+  - wastewater
+  - anomaly detection
+authors:
+  - given-names: Ryan
+    family-names: Gomez
+  - given-names: Anusha
+    family-names: Gudi
+  - given-names: Sukanya
+    family-names: Khot
+  - given-names: Shreyas
+    family-names: Mani
+preferred-citation:
+  type: software
+  title: "AquaIntel: Smart Wastewater Monitoring System — The Jellyfish"
+  authors:
+    - given-names: Ryan
+      family-names: Gomez
+    - given-names: Anusha
+      family-names: Gudi
+    - given-names: Sukanya
+      family-names: Khot
+    - given-names: Shreyas
+      family-names: Mani
+  year: 2025
+  url: "https://github.com/[username]/aquaintel"
+  license: MIT
+  version: "1.0.0"

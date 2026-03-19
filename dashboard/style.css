@@ -111,7 +111,7 @@ body {
     font-size: 2.5rem;
     font-weight: 700;
     letter-spacing: -1px;
-    background: linear-gradient(135deg, #2563eb, #64748b);
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -208,7 +208,7 @@ body {
 }
 
 .brand-icon {
-    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
