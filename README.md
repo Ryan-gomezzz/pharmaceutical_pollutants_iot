@@ -481,7 +481,7 @@ If you use this work in your research, please cite:
 ```bibtex
 @software{aquaintel2025,
   title     = {AquaIntel: Smart Wastewater Monitoring System — The Jellyfish},
-  author    = {Gomez, Ryan and Gudi, Anusha and Khot, Sukanya and Mani, Shreyas},
+  author    = {Ryan Gomez, Anusha Gudi, Sukanya Khot, Shreyas Mane},
   year      = {2025},
   url       = {https://github.com/[username]/aquaintel},
   license   = {MIT},
